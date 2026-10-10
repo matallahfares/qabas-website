@@ -3541,18 +3541,12 @@
 
 
 
-                    <!-- CONTACT FORM -->
+                    <!-- CONTACT FORM (CONNECTED TO SUPABASE) -->
 
                     <form
                         class="contact-form reveal"
                         id="contactForm"
-                        action="https://formsubmit.co/qabas.club@univ-mosta.dz"
-                        method="POST"
                     >
-                        <input type="hidden" name="_subject" value="New message from the QABAS website">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_captcha" value="true">
-                        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
 
                         <div class="form-row">
@@ -3647,7 +3641,8 @@
                             Send Message →
 
                         </button>
-
+                        
+                        <p id="contact-msg" class="text-xs text-emerald-400 mt-3 text-center hidden" style="margin-top:12px; font-weight:600;"></p>
 
                     </form>
 
@@ -4408,6 +4403,38 @@
                     regMsg.classList.remove('hidden');
                     registrationForm.reset();
                     setTimeout(() => regMsg.classList.add('hidden'), 5000);
+                }
+            });
+        }
+
+        // CONTACT FORM SUBMISSION TO SUPABASE
+        const contactForm = document.getElementById('contactForm');
+        const contactMsg = document.getElementById('contact-msg');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                contactMsg.classList.add('hidden');
+
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+
+                const { error } = await supabaseClient
+                    .from('messages')
+                    .insert([{ name, email, subject, message }]);
+
+                if (error) {
+                    contactMsg.textContent = 'Error: ' + error.message;
+                    contactMsg.className = 'text-xs text-red-400 mt-3 text-center';
+                    contactMsg.classList.remove('hidden');
+                } else {
+                    contactMsg.textContent = 'Message sent successfully to Supabase!';
+                    contactMsg.className = 'text-xs text-emerald-400 mt-3 text-center';
+                    contactMsg.classList.remove('hidden');
+                    contactForm.reset();
+                    setTimeout(() => contactMsg.classList.add('hidden'), 5000);
                 }
             });
         }
