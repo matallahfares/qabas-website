@@ -28,6 +28,9 @@
         rel="stylesheet"
     >
 
+    <!-- SUPABASE JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
 
         /* =========================================================
@@ -3399,7 +3402,7 @@
 
         
         <!-- =====================================================
-             EVENT REGISTRATION
+             EVENT REGISTRATION (CONNECTED TO SUPABASE)
         ====================================================== -->
         <section id="register" class="activities">
           <div class="container">
@@ -3408,10 +3411,7 @@
               <h2>Event Registration</h2>
               <p>Interested in a QABAS activity? Send us your details and the team will confirm event dates and availability.</p>
             </div>
-            <form class="contact-form reveal" action="https://formsubmit.co/qabas.club@univ-mosta.dz" method="POST">
-              <input type="hidden" name="_subject" value="QABAS event registration request">
-              <input type="hidden" name="_template" value="table">
-              <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+            <form class="contact-form reveal" id="registration-form">
               <div class="form-row">
                 <div class="form-group"><label for="reg-name">Full name</label><input id="reg-name" name="full_name" class="form-control" autocomplete="name" required placeholder="Your full name"></div>
                 <div class="form-group"><label for="reg-email">University email</label><input id="reg-email" name="email" type="email" class="form-control" autocomplete="email" required placeholder="you@example.com"></div>
@@ -3422,6 +3422,7 @@
               </div>
               <div class="form-group"><label for="reg-note">Note (optional)</label><textarea id="reg-note" name="note" class="form-control" rows="3" placeholder="Tell us anything we should know"></textarea></div>
               <button type="submit" class="btn btn-primary" style="width:100%">Send Registration Request →</button>
+              <p id="reg-msg" class="text-xs text-emerald-400 mt-3 text-center hidden" style="margin-top:12px; font-weight:600;"></p>
               <p style="font-size:12px;color:var(--text-light);margin-top:12px">This is a request, not a confirmed booking. Please do not submit sensitive medical information.</p>
             </form>
           </div>
@@ -3809,6 +3810,12 @@
 
     <script>
 
+        // SUPABASE INITIALIZATION
+        const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d2lsYXRldW9jaWlydGRkcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjAwMzEsImV4cCI6MjEwNzE5NjAzMX0.mTEv5c___wpOZCn-OZVBLz_P7lWfKEgioxl-RcXy-NA'; 
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
         /* =========================================================
            PRELOADER
@@ -4194,7 +4201,6 @@
             });
 
         });
-        /* Contact form submits securely to FormSubmit; first-use email confirmation is required. */
 
 
 
@@ -4372,6 +4378,39 @@
             if (navLinks) navLinks.classList.remove("open", "active");
           });
         });
+
+        // REGISTRATION FORM SUBMISSION TO SUPABASE
+        const registrationForm = document.getElementById('registration-form');
+        const regMsg = document.getElementById('reg-msg');
+
+        if (registrationForm) {
+            registrationForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                regMsg.classList.add('hidden');
+
+                const name = document.getElementById('reg-name').value;
+                const email = document.getElementById('reg-email').value;
+                const study_year = document.getElementById('reg-year').value;
+                const activity = document.getElementById('reg-event').value;
+                const note = document.getElementById('reg-note').value;
+
+                const { error } = await supabaseClient
+                    .from('registrations')
+                    .insert([{ name, email, study_year, activity, note }]);
+
+                if (error) {
+                    regMsg.textContent = 'Error: ' + error.message;
+                    regMsg.className = 'text-xs text-red-400 mt-3 text-center';
+                    regMsg.classList.remove('hidden');
+                } else {
+                    regMsg.textContent = 'Registration submitted successfully to Supabase!';
+                    regMsg.className = 'text-xs text-emerald-400 mt-3 text-center';
+                    regMsg.classList.remove('hidden');
+                    registrationForm.reset();
+                    setTimeout(() => regMsg.classList.add('hidden'), 5000);
+                }
+            });
+        }
 
 </script>
 
