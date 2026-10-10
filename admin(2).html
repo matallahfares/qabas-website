@@ -97,9 +97,9 @@
     </div>
 
     <script>
-        // Initialisation unique du client Supabase
+        // Configuration Supabase intégrée avec la vraie clé
         const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_H33zid94V6296IW4Vomfog_z6qI0'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d2lsYXRldW9jaWlydGRkcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjAwMzEsImV4cCI6MjEwNzE5NjAzMX0.mTEv5c___wpOZCn-OZVBLz_P7lWfKEgioxl-RcXy-NA'; 
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -176,7 +176,7 @@
         // Gérer l'enregistrement d'un événement
         eventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('event-title').value;
+            const title = document.getElementById('event-title5').value || document.getElementById('event-title').value;
             const event_date = document.getElementById('event-date').value;
 
             const { error } = await supabaseClient.from('events').insert([{ title, event_date }]);
