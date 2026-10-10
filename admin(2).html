@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QABAS - Espace Administrateur</title>
-    <!-- Tailwind CSS pour un design moderne et professionnel -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -41,9 +41,8 @@
             <p id="login-error" class="text-red-400 text-sm text-center mt-4 hidden"></p>
         </div>
 
-        <!-- SECTION 2 : TABLEAU DE BORD MODERNISÉ (Caché par défaut) -->
+        <!-- SECTION 2 : TABLEAU DE BORD (Caché par défaut) -->
         <div id="dashboard-section" class="hidden space-y-6">
-            <!-- En-tête du Dashboard -->
             <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-white">Tableau de Bord QABAS</h1>
@@ -54,10 +53,8 @@
                 </button>
             </div>
 
-            <!-- Grille de gestion -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Carte 1 : Modifier une date d'événement -->
+                <!-- Formulaire Événement -->
                 <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
@@ -82,7 +79,7 @@
                     <p id="event-msg" class="text-xs text-emerald-400 mt-3 hidden"></p>
                 </div>
 
-                <!-- Carte 2 : Liste des Inscriptions -->
+                <!-- Liste des Inscriptions -->
                 <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold text-white flex items-center gap-2">
@@ -94,18 +91,17 @@
                         <p class="text-slate-500 text-sm text-center py-8">Chargement des données...</p>
                     </div>
                 </div>
-
             </div>
         </div>
 
     </div>
 
     <script>
-        // Clés Supabase intégrées automatiquement
+        // Initialisation unique du client Supabase
         const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_H33zid94V6296IW4Vomfog_z6qI0'; 
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -118,7 +114,7 @@
 
         // Vérifier session active
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 showDashboard();
             }
@@ -131,7 +127,7 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
                 loginError.textContent = 'Erreur : ' + error.message;
@@ -150,14 +146,14 @@
 
         // Charger les inscriptions depuis Supabase
         async function loadRegistrations() {
-            const { data, error } = await supabase.from('registrations').select('*');
+            const { data, error } = await supabaseClient.from('registrations').select('*');
             
             if (error) {
-                registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur de chargement.</p>`;
+                registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur de chargement: ${error.message}</p>`;
                 return;
             }
 
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 registrationsList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucune inscription pour le moment.</p>`;
                 return;
             }
@@ -183,7 +179,7 @@
             const title = document.getElementById('event-title').value;
             const event_date = document.getElementById('event-date').value;
 
-            const { error } = await supabase.from('events').insert([{ title, event_date }]);
+            const { error } = await supabaseClient.from('events').insert([{ title, event_date }]);
 
             if (error) {
                 alert('Erreur lors de l\'enregistrement : ' + error.message);
@@ -197,7 +193,7 @@
 
         // Déconnexion
         logoutBtn.addEventListener('click', async () => {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             dashboardSection.classList.add('hidden');
             loginSection.classList.remove('hidden');
             loginForm.reset();
