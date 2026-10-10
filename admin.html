@@ -65,7 +65,7 @@
                         <form id="event-form" class="space-y-4">
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Titre de l'événement</label>
-                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Medical Research Day">
+                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Conférence IA">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Nouvelle date</label>
@@ -110,7 +110,7 @@
     </div>
 
     <script>
-        // Configuration Supabase
+        // Configuration Supabase intégrée
         const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d2lsYXRldW9jaWlydGRkcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjAwMzEsImV4cCI6MjEwNzE5NjAzMX0.mTEv5c___wpOZCn-OZVBLz_P7lWfKEgioxl-RcXy-NA'; 
         
@@ -185,7 +185,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
-                        <button onclick="deleteRow('registrations', ${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1.5 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
+                        <button onclick="deleteRegistration(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1.5 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
                             🗑️
                         </button>
                     </div>
@@ -217,7 +217,7 @@
                         <p class="text-sm font-medium text-white">${item.name || 'Sans nom'} <span class="text-xs text-slate-400">(${item.email || ''})</span></p>
                         <div class="flex items-center gap-2">
                             <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
-                            <button onclick="deleteRow('messages', ${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
+                            <button onclick="deleteMessage(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
                                 🗑️
                             </button>
                         </div>
@@ -228,16 +228,27 @@
             });
         }
 
-        // Supprimer une ligne
-        async function deleteRow(table, id) {
-            if (!confirm("Voulez-vous vraiment supprimer cet élément ?")) return;
+        // Supprimer une inscription
+        async function deleteRegistration(id) {
+            if (!confirm("Voulez-vous vraiment supprimer cette inscription ?")) return;
             
-            const { error } = await supabaseClient.from(table).delete().eq('id', id);
+            const { error } = await supabaseClient.from('registrations').delete().eq('id', id);
             if (error) {
                 alert("Erreur lors de la suppression : " + error.message);
             } else {
-                if (table === 'registrations') loadRegistrations();
-                if (table === 'messages') loadMessages();
+                loadRegistrations();
+            }
+        }
+
+        // Supprimer un message
+        async function deleteMessage(id) {
+            if (!confirm("Voulez-vous vraiment supprimer ce message ?")) return;
+            
+            const { error } = await supabaseClient.from('messages').delete().eq('id', id);
+            if (error) {
+                alert("Erreur lors de la suppression : " + error.message);
+            } else {
+                loadMessages();
             }
         }
 
