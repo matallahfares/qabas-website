@@ -176,13 +176,19 @@
             registrationsList.innerHTML = '';
             data.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl flex justify-between items-center";
+                card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl flex justify-between items-center gap-3";
                 card.innerHTML = `
-                    <div>
+                    <div class="flex-grow">
                         <p class="text-sm font-medium text-white">${item.name || 'Nom non renseigné'} <span class="text-xs text-blue-400">(${item.study_year || 'N/A'})</span></p>
                         <p class="text-xs text-slate-400">${item.email || 'Pas d\'email'} — <span class="text-slate-300">${item.activity || 'Activité non spécifiée'}</span></p>
+                        ${item.note ? `<p class="text-xs text-amber-300/80 italic mt-1">Note: ${item.note}</p>` : ''}
                     </div>
-                    <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
+                        <button onclick="deleteRegistration(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1.5 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
+                            🗑️
+                        </button>
+                    </div>
                 `;
                 registrationsList.appendChild(card);
             });
@@ -207,14 +213,43 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl space-y-1";
                 card.innerHTML = `
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center gap-2">
                         <p class="text-sm font-medium text-white">${item.name || 'Sans nom'} <span class="text-xs text-slate-400">(${item.email || ''})</span></p>
-                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
+                            <button onclick="deleteMessage(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
+                                🗑️
+                            </button>
+                        </div>
                     </div>
                     <p class="text-xs text-slate-300">${item.message || ''}</p>
                 `;
                 messagesList.appendChild(card);
             });
+        }
+
+        // Supprimer une inscription
+        async function deleteRegistration(id) {
+            if (!confirm("Voulez-vous vraiment supprimer cette inscription ?")) return;
+            
+            const { error } = await supabaseClient.from('registrations').delete().eq('id', id);
+            if (error) {
+                alert("Erreur lors de la suppression : " + error.message);
+            } else {
+                loadRegistrations();
+            }
+        }
+
+        // Supprimer un message
+        async function deleteMessage(id) {
+            if (!confirm("Voulez-vous vraiment supprimer ce message ?")) return;
+            
+            const { error } = await supabaseClient.from('messages').delete().eq('id', id);
+            if (error) {
+                alert("Erreur lors de la suppression : " + error.message);
+            } else {
+                loadMessages();
+            }
         }
 
         // Gérer l'enregistrement d'un événement
