@@ -161,7 +161,7 @@
 
         // Charger les inscriptions depuis Supabase
         async function loadRegistrations() {
-            const { data, error } = await supabaseClient.from('registrations').select('*').order('id', { ascending: false });
+            const { data, error } = await supabaseClient.from('registrations').select('*');
             
             if (error) {
                 registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
@@ -190,7 +190,7 @@
 
         // Charger les messages de contact depuis Supabase
         async function loadMessages() {
-            const { data, error } = await supabaseClient.from('messages').select('*').order('id', { ascending: false });
+            const { data, error } = await supabaseClient.from('messages').select('*');
             
             if (error) {
                 messagesList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
@@ -208,10 +208,10 @@
                 card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl space-y-1";
                 card.innerHTML = `
                     <div class="flex justify-between items-center">
-                        <p class="text-sm font-medium text-white">${item.name} <span class="text-xs text-slate-400">(${item.email})</span></p>
+                        <p class="text-sm font-medium text-white">${item.name || 'Sans nom'} <span class="text-xs text-slate-400">(${item.email || ''})</span></p>
                         <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
                     </div>
-                    <p class="text-xs text-slate-300">${item.message}</p>
+                    <p class="text-xs text-slate-300">${item.message || ''}</p>
                 `;
                 messagesList.appendChild(card);
             });
