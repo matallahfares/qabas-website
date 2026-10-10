@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QABAS - Espace Administrateur</title>
+    <!-- Tailwind CSS pour un design moderne et professionnel -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- CONTENEUR PRINCIPAL -->
+    <div class="w-full max-w-4xl">
+
+        <!-- SECTION 1 : CONNEXION -->
+        <div id="login-section" class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-md mx-auto transition-all duration-300">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">QABAS Admin</h1>
+                <p class="text-slate-400 text-sm mt-2">Connectez-vous pour gérer votre plateforme</p>
+            </div>
+            
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Email administrateur</label>
+                    <input type="email" id="email" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="admin@qabas.club">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Mot de passe</label>
+                    <input type="password" id="password" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-lg shadow-lg shadow-blue-600/30 transition-all">
+                    Se connecter
+                </button>
+            </form>
+            <p id="login-error" class="text-red-400 text-sm text-center mt-4 hidden"></p>
+        </div>
+
+        <!-- SECTION 2 : TABLEAU DE BORD MODERNISÉ (Caché par défaut) -->
+        <div id="dashboard-section" class="hidden space-y-6">
+            <!-- En-tête du Dashboard -->
+            <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Tableau de Bord QABAS</h1>
+                    <p class="text-slate-400 text-sm">Gérez vos événements et consultez les inscriptions en temps réel.</p>
+                </div>
+                <button id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg font-medium text-sm transition-all">
+                    Se déconnecter
+                </button>
+            </div>
+
+            <!-- Grille de gestion -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Carte 1 : Modifier une date d'événement -->
+                <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                            <span>📅</span> Mettre à jour un événement
+                        </h2>
+                        <p class="text-slate-400 text-sm mb-4">Modifiez la date ou le titre affiché sur le site.</p>
+                        
+                        <form id="event-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Titre de l'événement</label>
+                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Conférence IA">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Nouvelle date</label>
+                                <input type="date" id="event-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded-lg text-sm transition-all shadow-md">
+                                Enregistrer l'événement
+                            </button>
+                        </form>
+                    </div>
+                    <p id="event-msg" class="text-xs text-emerald-400 mt-3 hidden"></p>
+                </div>
+
+                <!-- Carte 2 : Liste des Inscriptions -->
+                <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <span>📝</span> Inscriptions reçues
+                        </h2>
+                        <button onclick="loadRegistrations()" class="text-xs text-blue-400 hover:underline">Actualiser</button>
+                    </div>
+                    <div class="overflow-y-auto max-h-60 pr-1 space-y-2 flex-grow" id="registrations-list">
+                        <p class="text-slate-500 text-sm text-center py-8">Chargement des données...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Clés Supabase intégrées automatiquement
+        const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_H33zid94V6296IW4Vomfog_z6qI0'; 
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const registrationsList = document.getElementById('registrations-list');
+        const eventForm = document.getElementById('event-form');
+        const eventMsg = document.getElementById('event-msg');
+
+        // Vérifier session active
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                showDashboard();
+            }
+        }
+
+        // Connexion
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.classList.add('hidden');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                loginError.textContent = 'Erreur : ' + error.message;
+                loginError.classList.remove('hidden');
+            } else {
+                showDashboard();
+            }
+        });
+
+        // Afficher dashboard
+        function showDashboard() {
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            loadRegistrations();
+        }
+
+        // Charger les inscriptions depuis Supabase
+        async function loadRegistrations() {
+            const { data, error } = await supabase.from('registrations').select('*');
+            
+            if (error) {
+                registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur de chargement.</p>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                registrationsList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucune inscription pour le moment.</p>`;
+                return;
+            }
+
+            registrationsList.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl flex justify-between items-center";
+                card.innerHTML = `
+                    <div>
+                        <p class="text-sm font-medium text-white">${item.name || 'Nom non renseigné'}</p>
+                        <p class="text-xs text-slate-400">${item.email || 'Pas d\'email'}</p>
+                    </div>
+                    <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
+                `;
+                registrationsList.appendChild(card);
+            });
+        }
+
+        // Gérer l'enregistrement d'un événement
+        eventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('event-title').value;
+            const event_date = document.getElementById('event-date').value;
+
+            const { error } = await supabase.from('events').insert([{ title, event_date }]);
+
+            if (error) {
+                alert('Erreur lors de l\'enregistrement : ' + error.message);
+            } else {
+                eventMsg.textContent = 'Événement mis à jour avec succès !';
+                eventMsg.classList.remove('hidden');
+                eventForm.reset();
+                setTimeout(() => eventMsg.classList.add('hidden'), 4000);
+            }
+        });
+
+        // Déconnexion
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            dashboardSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            loginForm.reset();
+        });
+
+        checkSession();
+    </script>
+</body>
+</html>
