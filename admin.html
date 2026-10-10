@@ -16,7 +16,7 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
 
     <!-- CONTENEUR PRINCIPAL -->
-    <div class="w-full max-w-4xl">
+    <div class="w-full max-w-5xl">
 
         <!-- SECTION 1 : CONNEXION -->
         <div id="login-section" class="bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-md mx-auto transition-all duration-300">
@@ -46,7 +46,7 @@
             <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-white">Tableau de Bord QABAS</h1>
-                    <p class="text-slate-400 text-sm">Gérez vos événements et consultez les inscriptions en temps réel.</p>
+                    <p class="text-slate-400 text-sm">Gérez vos événements et consultez les inscriptions et messages en temps réel.</p>
                 </div>
                 <button id="logout-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-4 py-2 rounded-lg font-medium text-sm transition-all">
                     Se déconnecter
@@ -92,12 +92,25 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Liste des Messages de Contact -->
+            <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                        <span>✉️</span> Messages de contact ("Let's connect")
+                    </h2>
+                    <button onclick="loadMessages()" class="text-xs text-blue-400 hover:underline">Actualiser</button>
+                </div>
+                <div class="overflow-y-auto max-h-60 pr-1 space-y-2 flex-grow" id="messages-list">
+                    <p class="text-slate-500 text-sm text-center py-8">Chargement des messages...</p>
+                </div>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // Configuration Supabase intégrée avec la vraie clé
+        // Configuration Supabase intégrée
         const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d2lsYXRldW9jaWlydGRkcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjAwMzEsImV4cCI6MjEwNzE5NjAzMX0.mTEv5c___wpOZCn-OZVBLz_P7lWfKEgioxl-RcXy-NA'; 
         
@@ -109,6 +122,7 @@
         const loginError = document.getElementById('login-error');
         const logoutBtn = document.getElementById('logout-btn');
         const registrationsList = document.getElementById('registrations-list');
+        const messagesList = document.getElementById('messages-list');
         const eventForm = document.getElementById('event-form');
         const eventMsg = document.getElementById('event-msg');
 
@@ -142,14 +156,15 @@
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             loadRegistrations();
+            loadMessages();
         }
 
         // Charger les inscriptions depuis Supabase
         async function loadRegistrations() {
-            const { data, error } = await supabaseClient.from('registrations').select('*');
+            const { data, error } = await supabaseClient.from('registrations').select('*').order('id', { ascending: false });
             
             if (error) {
-                registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur de chargement: ${error.message}</p>`;
+                registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
                 return;
             }
 
@@ -164,8 +179,8 @@
                 card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl flex justify-between items-center";
                 card.innerHTML = `
                     <div>
-                        <p class="text-sm font-medium text-white">${item.name || 'Nom non renseigné'}</p>
-                        <p class="text-xs text-slate-400">${item.email || 'Pas d\'email'}</p>
+                        <p class="text-sm font-medium text-white">${item.name || 'Nom non renseigné'} <span class="text-xs text-blue-400">(${item.study_year || 'N/A'})</span></p>
+                        <p class="text-xs text-slate-400">${item.email || 'Pas d\'email'} — <span class="text-slate-300">${item.activity || 'Activité non spécifiée'}</span></p>
                     </div>
                     <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
                 `;
@@ -173,10 +188,39 @@
             });
         }
 
+        // Charger les messages de contact depuis Supabase
+        async function loadMessages() {
+            const { data, error } = await supabaseClient.from('messages').select('*').order('id', { ascending: false });
+            
+            if (error) {
+                messagesList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                messagesList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucun message pour le moment.</p>`;
+                return;
+            }
+
+            messagesList.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/50 border border-slate-700/50 p-3 rounded-xl space-y-1";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <p class="text-sm font-medium text-white">${item.name} <span class="text-xs text-slate-400">(${item.email})</span></p>
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
+                    </div>
+                    <p class="text-xs text-slate-300">${item.message}</p>
+                `;
+                messagesList.appendChild(card);
+            });
+        }
+
         // Gérer l'enregistrement d'un événement
         eventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('event-title5').value || document.getElementById('event-title').value;
+            const title = document.getElementById('event-title').value;
             const event_date = document.getElementById('event-date').value;
 
             const { error } = await supabaseClient.from('events').insert([{ title, event_date }]);
