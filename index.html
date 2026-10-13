@@ -4407,6 +4407,45 @@
             });
         }
 
+        // LOAD EVENTS FROM SUPABASE (title + date managed from admin.html)
+        async function loadEvents() {
+            const cards = document.querySelectorAll('#events .event-card');
+            if (!cards.length) return;
+
+            const { data, error } = await supabaseClient
+                .from('events')
+                .select('id, title, event_date');
+
+            if (error || !data) {
+                console.error('Could not load events:', error);
+                return;
+            }
+
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+            // Card 1 -> event id 1, card 2 -> id 2, card 3 -> id 3
+            cards.forEach((card, index) => {
+                const ev = data.find(item => item.id === index + 1);
+                if (!ev) return;
+
+                if (ev.title) {
+                    const titleEl = card.querySelector('.event-body h3');
+                    if (titleEl) titleEl.textContent = ev.title;
+                }
+
+                if (ev.event_date) {
+                    // Parse "YYYY-MM-DD" manually to avoid timezone shifts
+                    const [year, month, day] = ev.event_date.split('-').map(Number);
+                    const dayEl = card.querySelector('.event-date strong');
+                    const monthEl = card.querySelector('.event-date span');
+                    if (dayEl) dayEl.textContent = day;
+                    if (monthEl) monthEl.textContent = months[month - 1];
+                }
+            });
+        }
+
+        loadEvents();
+
         // CONTACT FORM SUBMISSION TO SUPABASE
         const contactForm = document.getElementById('contactForm');
         const contactMsg = document.getElementById('contact-msg');
