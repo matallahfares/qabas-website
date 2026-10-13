@@ -66,12 +66,15 @@
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Sélectionner l'événement à modifier</label>
                                 <select id="event-select" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                                    <option value="" disabled selected>Chargement des événements...</option>
+                                    <option value="" disabled selected>Choisissez un événement</option>
+                                    <option value="1">1 - Anatomy Workshop</option>
+                                    <option value="2">2 - Medical Research Day</option>
+                                    <option value="3">3 - Phytotherapy & Health</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Nouveau titre de l'événement</label>
-                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Anatomy Workshop">
+                                <label class="block text-xs text-slate-400 mb-1">Titre de l'événement</label>
+                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Titre de l'événement">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Nouvelle date</label>
@@ -116,7 +119,6 @@
     </div>
 
     <script>
-        // Configuration Supabase intégrée
         const SUPABASE_URL = 'https://ywwilateuociirtddqul.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3d2lsYXRldW9jaWlydGRkcXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjAwMzEsImV4cCI6MjEwNzE5NjAzMX0.mTEv5c___wpOZCn-OZVBLz_P7lWfKEgioxl-RcXy-NA'; 
         
@@ -130,11 +132,11 @@
         const registrationsList = document.getElementById('registrations-list');
         const messagesList = document.getElementById('messages-list');
         const eventForm = document.getElementById('event-form');
-        const eventMsg = document.getElementById('event-msg');
         const eventSelect = document.getElementById('event-select');
         const eventTitleInput = document.getElementById('event-title');
+        const eventDateInput = document.getElementById('event-date');
+        const eventMsg = document.getElementById('event-msg');
 
-        // Vérifier session active
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
@@ -142,7 +144,6 @@
             }
         }
 
-        // Connexion
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginError.classList.add('hidden');
@@ -159,61 +160,51 @@
             }
         });
 
-        // Afficher dashboard
         function showDashboard() {
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             loadRegistrations();
             loadMessages();
-            loadEventsForAdmin();
         }
 
-        // Charger les événements existants dans le sélecteur
-        async function loadEventsForAdmin() {
-            const { data, error } = await supabaseClient.from('events').select('*');
-            
-            if (error) {
-                eventSelect.innerHTML = `<option value="" disabled>Erreur de chargement</option>`;
-                return;
+        eventSelect.addEventListener('change', async () => {
+            const id = parseInt(eventSelect.value);
+            const { data } = await supabaseClient.from('events').select('*').eq('id', id).single();
+            if (data) {
+                eventTitleInput.value = data.title || '';
+                eventDateInput.value = data.event_date || '';
             }
-
-            if (!data || data.length === 0) {
-                eventSelect.innerHTML = `<option value="" disabled>Aucun événement trouvé</option>`;
-                return;
-            }
-
-            eventSelect.innerHTML = `<option value="" disabled selected>Choisissez un événement</option>`;
-            data.forEach(ev => {
-                const opt = document.createElement('option');
-                opt.value = ev.id;
-                opt.textContent = `${ev.title} (${ev.event_date || 'Date non définie'})`;
-                opt.dataset.title = ev.title;
-                opt.dataset.date = ev.event_date || '';
-                eventSelect.appendChild(opt);
-            });
-        }
-
-        // Pré-remplir les champs lors de la sélection d'un événement
-        eventSelect.addEventListener('change', () => {
-            const selectedOpt = eventSelect.options[eventSelect.selectedIndex];
-            eventTitleInput.value = selectedOpt.dataset.title || '';
-            document.getElementById('event-date').value = selectedOpt.dataset.date || '';
         });
 
-        // Charger les inscriptions depuis Supabase
+        eventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = parseInt(eventSelect.value);
+            const title = eventTitleInput.value;
+            const event_date = eventDateInput.value;
+
+            const { error } = await supabaseClient
+                .from('events')
+                .upsert([{ id, title, event_date }]);
+
+            if (error) {
+                alert('Erreur : ' + error.message);
+            } else {
+                eventMsg.textContent = 'Événement mis à jour avec succès !';
+                eventMsg.classList.remove('hidden');
+                setTimeout(() => eventMsg.classList.add('hidden'), 4000);
+            }
+        });
+
         async function loadRegistrations() {
             const { data, error } = await supabaseClient.from('registrations').select('*');
-            
             if (error) {
                 registrationsList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
                 return;
             }
-
             if (!data || data.length === 0) {
                 registrationsList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucune inscription pour le moment.</p>`;
                 return;
             }
-
             registrationsList.innerHTML = '';
             data.forEach(item => {
                 const card = document.createElement('div');
@@ -226,29 +217,23 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-md border border-blue-500/20">Inscrit</span>
-                        <button onclick="deleteRegistration(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1.5 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
-                            🗑️
-                        </button>
+                        <button onclick="deleteRegistration(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1.5 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">🗑️</button>
                     </div>
                 `;
                 registrationsList.appendChild(card);
             });
         }
 
-        // Charger les messages de contact depuis Supabase
         async function loadMessages() {
             const { data, error } = await supabaseClient.from('messages').select('*');
-            
             if (error) {
                 messagesList.innerHTML = `<p class="text-red-400 text-sm text-center py-4">Erreur: ${error.message}</p>`;
                 return;
             }
-
             if (!data || data.length === 0) {
                 messagesList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucun message pour le moment.</p>`;
                 return;
             }
-
             messagesList.innerHTML = '';
             data.forEach(item => {
                 const card = document.createElement('div');
@@ -257,10 +242,8 @@
                     <div class="flex justify-between items-center gap-2">
                         <p class="text-sm font-medium text-white">${item.name || 'Sans nom'} <span class="text-xs text-slate-400">(${item.email || ''})</span></p>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/22">${item.subject || 'Message'}</span>
-                            <button onclick="deleteMessage(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
-                                🗑️
-                            </button>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
+                            <button onclick="deleteMessage(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">🗑️</button>
                         </div>
                     </div>
                     <p class="text-xs text-slate-300">${item.message || ''}</p>
@@ -269,58 +252,20 @@
             });
         }
 
-        // Supprimer une inscription
         async function deleteRegistration(id) {
             if (!confirm("Voulez-vous vraiment supprimer cette inscription ?")) return;
-            
             const { error } = await supabaseClient.from('registrations').delete().eq('id', id);
-            if (error) {
-                alert("Erreur lors de la suppression : " + error.message);
-            } else {
-                loadRegistrations();
-            }
+            if (error) alert("Erreur : " + error.message);
+            else loadRegistrations();
         }
 
-        // Supprimer un message
         async function deleteMessage(id) {
             if (!confirm("Voulez-vous vraiment supprimer ce message ?")) return;
-            
             const { error } = await supabaseClient.from('messages').delete().eq('id', id);
-            if (error) {
-                alert("Erreur lors de la suppression : " + error.message);
-            } else {
-                loadMessages();
-            }
+            if (error) alert("Erreur : " + error.message);
+            else loadMessages();
         }
 
-        // Mettre à jour un événement existant dans Supabase
-        eventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const eventId = eventSelect.value;
-            const title = eventTitleInput.value;
-            const event_date = document.getElementById('event-date').value;
-
-            if (!eventId) {
-                alert("Veuillez sélectionner un événement.");
-                return;
-            }
-
-            const { error } = await supabaseClient
-                .from('events')
-                .update({ title, event_date })
-                .eq('id', eventId);
-
-            if (error) {
-                alert('Erreur lors de la mise à jour : ' + error.message);
-            } else {
-                eventMsg.textContent = 'Événement mis à jour avec succès !';
-                eventMsg.classList.remove('hidden');
-                loadEventsForAdmin();
-                setTimeout(() => eventMsg.classList.add('hidden'), 4000);
-            }
-        });
-
-        // Déconnexion
         logoutBtn.addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             dashboardSection.classList.add('hidden');
