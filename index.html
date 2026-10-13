@@ -2367,6 +2367,9 @@
         }
 
     
+        /* Single event card layout */
+        .events-grid.single { grid-template-columns: minmax(0, 420px); justify-content: center; }
+
         /* Added QABAS improvements */
         .form-control { width:100%; box-sizing:border-box; }
         .form-control[hidden], [hidden] { display:none !important; }
@@ -2904,7 +2907,7 @@
 
 
 
-                <div class="events-grid">
+                <div class="events-grid single">
 
 
                     <!-- EVENT 1 -->
@@ -2947,117 +2950,6 @@
                                 An interactive learning session
                                 designed to strengthen anatomy
                                 knowledge through practical activities.
-                            </p>
-
-                            <a
-                                href="#register"
-                                class="event-link"
-                            >
-                                Register interest →
-                            </a>
-
-                        </div>
-
-                    </article>
-
-
-
-                    <!-- EVENT 2 -->
-
-                    <article class="event-card reveal">
-
-                        <div class="event-image">
-
-                            <img
-                                src="https://images.unsplash.com/photo-1584982751601-97dcc096659c?auto=format&fit=crop&w=800&q=80"
-                                alt="Scientific conference"
-                            >
-
-                            <div class="event-date">
-
-                                <strong>
-                                    22
-                                </strong>
-
-                                <span>
-                                    Nov
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="event-body">
-
-                            <span class="event-category">
-                                Conference
-                            </span>
-
-                            <h3>
-                                Medical Research Day
-                            </h3>
-
-                            <p>
-                                A day dedicated to research,
-                                scientific communication and
-                                discovering new perspectives
-                                in medicine.
-                            </p>
-
-                            <a
-                                href="#register"
-                                class="event-link"
-                            >
-                                Register interest →
-                            </a>
-
-                        </div>
-
-                    </article>
-
-
-
-                    <!-- EVENT 3 -->
-
-                    <article class="event-card reveal">
-
-                        <div class="event-image">
-
-                            <img
-                                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80"
-                                alt="Phytotherapy"
-                            >
-
-                            <div class="event-date">
-
-                                <strong>
-                                    30
-                                </strong>
-
-                                <span>
-                                    Nov
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="event-body">
-
-                            <span class="event-category">
-                                Seminar
-                            </span>
-
-                            <h3>
-                                Phytotherapy & Health
-                            </h3>
-
-                            <p>
-                                Explore the relationship between
-                                medicinal plants, modern medicine
-                                and evidence-based healthcare.
                             </p>
 
                             <a
@@ -4414,7 +4306,7 @@
 
             const { data, error } = await supabaseClient
                 .from('events')
-                .select('id, title, event_date');
+                .select('id, title, event_date, image_url');
 
             if (error || !data) {
                 console.error('Could not load events:', error);
@@ -4440,6 +4332,11 @@
                     const monthEl = card.querySelector('.event-date span');
                     if (dayEl) dayEl.textContent = day;
                     if (monthEl) monthEl.textContent = months[month - 1];
+                }
+
+                if (ev.image_url) {
+                    const imgEl = card.querySelector('.event-image img');
+                    if (imgEl) imgEl.src = ev.image_url;
                 }
             });
         }
