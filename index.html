@@ -4306,7 +4306,7 @@
 
             const { data, error } = await supabaseClient
                 .from('events')
-                .select('id, title, event_date, image_url');
+                .select('id, title, event_date, image_url, description');
 
             if (error || !data) {
                 console.error('Could not load events:', error);
@@ -4332,6 +4332,11 @@
                     const monthEl = card.querySelector('.event-date span');
                     if (dayEl) dayEl.textContent = day;
                     if (monthEl) monthEl.textContent = months[month - 1];
+                }
+
+                if (ev.description) {
+                    const descEl = card.querySelector('.event-body p');
+                    if (descEl) descEl.textContent = ev.description;
                 }
 
                 if (ev.image_url) {
