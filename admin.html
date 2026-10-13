@@ -72,6 +72,10 @@
                                 <input type="date" id="event-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                             </div>
                             <div>
+                                <label class="block text-xs text-slate-400 mb-1">Description de l'événement</label>
+                                <textarea id="event-description" rows="4" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Décrivez l'événement..."></textarea>
+                            </div>
+                            <div>
                                 <label class="block text-xs text-slate-400 mb-1">Image de l'événement</label>
                                 <img id="event-image-preview" alt="Aperçu" class="hidden w-full h-40 object-cover rounded-lg border border-slate-700 mb-2">
                                 <input type="file" id="event-image" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600">
@@ -130,6 +134,7 @@
         const messagesList = document.getElementById('messages-list');
         const eventForm = document.getElementById('event-form');
         const EVENT_ID = 1; // the single event shown on the website
+        const eventDescriptionInput = document.getElementById('event-description');
         const eventImageInput = document.getElementById('event-image');
         const eventImagePreview = document.getElementById('event-image-preview');
         const eventSubmit = document.getElementById('event-submit');
@@ -174,6 +179,7 @@
             if (data) {
                 eventTitleInput.value = data.title || '';
                 eventDateInput.value = data.event_date || '';
+                eventDescriptionInput.value = data.description || '';
                 currentImageUrl = data.image_url || null;
                 if (currentImageUrl) {
                     eventImagePreview.src = currentImageUrl;
@@ -217,6 +223,7 @@
                         id: EVENT_ID,
                         title: eventTitleInput.value,
                         event_date: eventDateInput.value,
+                        description: eventDescriptionInput.value,
                         image_url
                     }]);
                 if (error) throw error;
