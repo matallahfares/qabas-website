@@ -58,29 +58,26 @@
                 <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-xl flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                            <span>📅</span> Mettre à jour un événement
+                            <span>📅</span> Mettre à jour l'événement
                         </h2>
-                        <p class="text-slate-400 text-sm mb-4">Modifiez la date ou le titre affiché sur le site.</p>
-                        
+                        <p class="text-slate-400 text-sm mb-4">Modifiez le titre, la date ou l'image affichés sur le site.</p>
+
                         <form id="event-form" class="space-y-4">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Sélectionner l'événement à modifier</label>
-                                <select id="event-select" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-                                    <option value="" disabled selected>Choisissez un événement</option>
-                                    <option value="1">1 - Anatomy Workshop</option>
-                                    <option value="2">2 - Medical Research Day</option>
-                                    <option value="3">3 - Phytotherapy & Health</option>
-                                </select>
-                            </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Titre de l'événement</label>
                                 <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Titre de l'événement">
                             </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Nouvelle date</label>
+                                <label class="block text-xs text-slate-400 mb-1">Date</label>
                                 <input type="date" id="event-date" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded-lg text-sm transition-all shadow-md">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Image de l'événement</label>
+                                <img id="event-image-preview" alt="Aperçu" class="hidden w-full h-40 object-cover rounded-lg border border-slate-700 mb-2">
+                                <input type="file" id="event-image" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600">
+                                <p class="text-xs text-slate-500 mt-1">Laissez vide pour garder l'image actuelle.</p>
+                            </div>
+                            <button type="submit" id="event-submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded-lg text-sm transition-all shadow-md">
                                 Enregistrer l'événement
                             </button>
                         </form>
@@ -132,7 +129,11 @@
         const registrationsList = document.getElementById('registrations-list');
         const messagesList = document.getElementById('messages-list');
         const eventForm = document.getElementById('event-form');
-        const eventSelect = document.getElementById('event-select');
+        const EVENT_ID = 1; // the single event shown on the website
+        const eventImageInput = document.getElementById('event-image');
+        const eventImagePreview = document.getElementById('event-image-preview');
+        const eventSubmit = document.getElementById('event-submit');
+        let currentImageUrl = null;
         const eventTitleInput = document.getElementById('event-title');
         const eventDateInput = document.getElementById('event-date');
         const eventMsg = document.getElementById('event-msg');
@@ -163,35 +164,74 @@
         function showDashboard() {
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
+            loadEvent();
             loadRegistrations();
             loadMessages();
         }
 
-        eventSelect.addEventListener('change', async () => {
-            const id = parseInt(eventSelect.value);
-            const { data } = await supabaseClient.from('events').select('*').eq('id', id).single();
+        async function loadEvent() {
+            const { data } = await supabaseClient.from('events').select('*').eq('id', EVENT_ID).maybeSingle();
             if (data) {
                 eventTitleInput.value = data.title || '';
                 eventDateInput.value = data.event_date || '';
+                currentImageUrl = data.image_url || null;
+                if (currentImageUrl) {
+                    eventImagePreview.src = currentImageUrl;
+                    eventImagePreview.classList.remove('hidden');
+                }
+            }
+        }
+
+        eventImageInput.addEventListener('change', () => {
+            const file = eventImageInput.files[0];
+            if (file) {
+                eventImagePreview.src = URL.createObjectURL(file);
+                eventImagePreview.classList.remove('hidden');
             }
         });
 
         eventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = parseInt(eventSelect.value);
-            const title = eventTitleInput.value;
-            const event_date = eventDateInput.value;
+            eventSubmit.disabled = true;
+            eventSubmit.textContent = 'Enregistrement...';
 
-            const { error } = await supabaseClient
-                .from('events')
-                .upsert([{ id, title, event_date }]);
+            try {
+                let image_url = currentImageUrl;
+                const file = eventImageInput.files[0];
 
-            if (error) {
-                alert('Erreur : ' + error.message);
-            } else {
+                // Upload the new image to Supabase Storage (bucket: event-images)
+                if (file) {
+                    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                    const path = `event-${EVENT_ID}-${Date.now()}.${ext}`;
+                    const { error: upErr } = await supabaseClient.storage
+                        .from('event-images')
+                        .upload(path, file, { cacheControl: '3600', upsert: false });
+                    if (upErr) throw upErr;
+                    const { data: pub } = supabaseClient.storage.from('event-images').getPublicUrl(path);
+                    image_url = pub.publicUrl;
+                }
+
+                const { error } = await supabaseClient
+                    .from('events')
+                    .upsert([{
+                        id: EVENT_ID,
+                        title: eventTitleInput.value,
+                        event_date: eventDateInput.value,
+                        image_url
+                    }]);
+                if (error) throw error;
+
+                currentImageUrl = image_url;
+                eventImageInput.value = '';
+                eventMsg.className = 'text-xs text-emerald-400 mt-3';
                 eventMsg.textContent = 'Événement mis à jour avec succès !';
                 eventMsg.classList.remove('hidden');
                 setTimeout(() => eventMsg.classList.add('hidden'), 4000);
+            } catch (err) {
+                alert('Erreur : ' + err.message);
+            } finally {
+                eventSubmit.disabled = false;
+                eventSubmit.textContent = "Enregistrer l'événement";
             }
         });
 
