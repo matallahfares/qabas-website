@@ -64,8 +64,14 @@
                         
                         <form id="event-form" class="space-y-4">
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">Titre de l'événement</label>
-                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Conférence IA">
+                                <label class="block text-xs text-slate-400 mb-1">Sélectionner l'événement à modifier</label>
+                                <select id="event-select" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                                    <option value="" disabled selected>Chargement des événements...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Nouveau titre de l'événement</label>
+                                <input type="text" id="event-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Ex: Anatomy Workshop">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Nouvelle date</label>
@@ -125,6 +131,8 @@
         const messagesList = document.getElementById('messages-list');
         const eventForm = document.getElementById('event-form');
         const eventMsg = document.getElementById('event-msg');
+        const eventSelect = document.getElementById('event-select');
+        const eventTitleInput = document.getElementById('event-title');
 
         // Vérifier session active
         async function checkSession() {
@@ -157,7 +165,40 @@
             dashboardSection.classList.remove('hidden');
             loadRegistrations();
             loadMessages();
+            loadEventsForAdmin();
         }
+
+        // Charger les événements existants dans le sélecteur
+        async function loadEventsForAdmin() {
+            const { data, error } = await supabaseClient.from('events').select('*');
+            
+            if (error) {
+                eventSelect.innerHTML = `<option value="" disabled>Erreur de chargement</option>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                eventSelect.innerHTML = `<option value="" disabled>Aucun événement trouvé</option>`;
+                return;
+            }
+
+            eventSelect.innerHTML = `<option value="" disabled selected>Choisissez un événement</option>`;
+            data.forEach(ev => {
+                const opt = document.createElement('option');
+                opt.value = ev.id;
+                opt.textContent = `${ev.title} (${ev.event_date || 'Date non définie'})`;
+                opt.dataset.title = ev.title;
+                opt.dataset.date = ev.event_date || '';
+                eventSelect.appendChild(opt);
+            });
+        }
+
+        // Pré-remplir les champs lors de la sélection d'un événement
+        eventSelect.addEventListener('change', () => {
+            const selectedOpt = eventSelect.options[eventSelect.selectedIndex];
+            eventTitleInput.value = selectedOpt.dataset.title || '';
+            document.getElementById('event-date').value = selectedOpt.dataset.date || '';
+        });
 
         // Charger les inscriptions depuis Supabase
         async function loadRegistrations() {
@@ -216,7 +257,7 @@
                     <div class="flex justify-between items-center gap-2">
                         <p class="text-sm font-medium text-white">${item.name || 'Sans nom'} <span class="text-xs text-slate-400">(${item.email || ''})</span></p>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">${item.subject || 'Message'}</span>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/22">${item.subject || 'Message'}</span>
                             <button onclick="deleteMessage(${item.id})" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-1 rounded-lg border border-red-500/30 transition-all text-xs" title="Supprimer">
                                 🗑️
                             </button>
@@ -252,20 +293,29 @@
             }
         }
 
-        // Gérer l'enregistrement d'un événement
+        // Mettre à jour un événement existant dans Supabase
         eventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('event-title').value;
+            const eventId = eventSelect.value;
+            const title = eventTitleInput.value;
             const event_date = document.getElementById('event-date').value;
 
-            const { error } = await supabaseClient.from('events').insert([{ title, event_date }]);
+            if (!eventId) {
+                alert("Veuillez sélectionner un événement.");
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('events')
+                .update({ title, event_date })
+                .eq('id', eventId);
 
             if (error) {
-                alert('Erreur lors de l\'enregistrement : ' + error.message);
+                alert('Erreur lors de la mise à jour : ' + error.message);
             } else {
                 eventMsg.textContent = 'Événement mis à jour avec succès !';
                 eventMsg.classList.remove('hidden');
-                eventForm.reset();
+                loadEventsForAdmin();
                 setTimeout(() => eventMsg.classList.add('hidden'), 4000);
             }
         });
