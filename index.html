@@ -48,15 +48,15 @@
 
             --accent: #d5ad42;
 
-            --bg: #f8faf7;
-            --bg-2: #eef5ee;
+            --bg: #f4ecdc;
+            --bg-2: #eadfc9;
 
-            --white: #ffffff;
+            --white: #faf5e9;
 
             --text: #122219;
-            --text-light: #68746c;
+            --text-light: #5f685e;
 
-            --border: #dfe8e0;
+            --border: #dccfb3;
 
             --shadow-sm:
                 0 8px 25px rgba(13, 50, 33, 0.07);
@@ -256,7 +256,7 @@
             padding: 9px 0;
 
             background:
-                rgba(248,250,247,0.90);
+                rgba(244,236,220,0.92);
 
             backdrop-filter: blur(20px);
 
@@ -837,7 +837,7 @@
             position: absolute;
 
             background:
-                rgba(255,255,255,0.94);
+                rgba(250,245,233,0.94);
 
             color: var(--text);
 
@@ -1623,7 +1623,7 @@
 
         .btn-light {
 
-            background: white;
+            background: var(--bg);
 
             color: var(--primary);
 
@@ -2378,6 +2378,252 @@
         #register .contact-form { max-width:820px; margin-left:auto; margin-right:auto; }
         #resources .form-control { border-radius:12px; }
 
+
+        /* =========================================================
+           ANIMATIONS
+        ========================================================= */
+
+        /* scroll progress bar */
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; height: 4px; width: 0;
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary), var(--accent));
+            z-index: 100000; transition: width 0.1s linear;
+        }
+
+        /* drifting soft blobs behind the hero */
+        .hero-blobs { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+        .hero-blobs span {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.45;
+            animation: drift 16s ease-in-out infinite;
+        }
+        .hero-blobs span:nth-child(1) { width: 320px; height: 320px; background: rgba(169,200,90,0.55); top: 8%;  left: 4%;  }
+        .hero-blobs span:nth-child(2) { width: 260px; height: 260px; background: rgba(213,173,66,0.35);  bottom: 6%; left: 42%; animation-delay: -5s;  animation-duration: 20s; }
+        .hero-blobs span:nth-child(3) { width: 380px; height: 380px; background: rgba(40,121,78,0.28);   top: 12%; right: 2%; animation-delay: -9s;  animation-duration: 23s; }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33%      { transform: translate(60px, -40px) scale(1.12); }
+            66%      { transform: translate(-50px, 50px) scale(0.92); }
+        }
+
+        /* heartbeat (ECG) line, echoing the QABAS logo */
+        .ecg {
+            position: absolute; left: 0; bottom: 8px; width: 100%; height: 70px;
+            z-index: 1; pointer-events: none; opacity: 0.35;
+        }
+        .ecg path {
+            fill: none; stroke: var(--primary-light); stroke-width: 2.5;
+            stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 1400; stroke-dashoffset: 1400;
+            animation: ecgDraw 5s ease-in-out infinite;
+        }
+        @keyframes ecgDraw {
+            0%   { stroke-dashoffset: 1400; }
+            55%  { stroke-dashoffset: 0; }
+            85%  { stroke-dashoffset: 0; opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0; }
+        }
+
+        /* hero text: shimmering green word + entrance stagger */
+        .hero h1 .green {
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary), var(--primary-light));
+            background-size: 200% auto;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+            animation: shimmer 5s linear infinite;
+        }
+        @keyframes shimmer { to { background-position: 200% center; } }
+
+        .hero-content .badge        { animation: fadeUp 0.8s 0.1s ease both; }
+        .hero-content h1            { animation: fadeUp 0.9s 0.25s ease both; }
+        .hero-content .hero-description { animation: fadeUp 0.9s 0.4s ease both; }
+        .hero-content .hero-buttons { animation: fadeUp 0.9s 0.55s ease both; }
+
+        .badge-dot { animation: pulseDot 2s ease-out infinite; }
+        @keyframes pulseDot {
+            0%   { box-shadow: 0 0 0 0 rgba(169,200,90,0.55); }
+            100% { box-shadow: 0 0 0 12px rgba(169,200,90,0); }
+        }
+
+        /* button shine sweep */
+        .btn { position: relative; overflow: hidden; }
+        .btn::after {
+            content: ""; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-20deg); transition: left 0.6s ease; pointer-events: none;
+        }
+        .btn:hover::after { left: 130%; }
+
+        /* staggered reveal inside grids */
+        .activity-grid .reveal:nth-child(2), .gallery-grid .reveal:nth-child(2), .events-grid .reveal:nth-child(2), .feature-list .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .activity-grid .reveal:nth-child(3), .gallery-grid .reveal:nth-child(3), .events-grid .reveal:nth-child(3), .feature-list .reveal:nth-child(3) { transition-delay: 0.24s; }
+        .activity-grid .reveal:nth-child(4), .gallery-grid .reveal:nth-child(4), .events-grid .reveal:nth-child(4), .feature-list .reveal:nth-child(4) { transition-delay: 0.36s; }
+
+        /* icons wiggle when their card is hovered */
+        .activity-card:hover .activity-icon { animation: wiggle 0.6s ease; }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0); }
+            25%      { transform: rotate(-12deg) scale(1.08); }
+            75%      { transform: rotate(10deg) scale(1.08); }
+        }
+        .feature:hover .feature-icon { transform: scale(1.12) rotate(-4deg); transition: var(--transition); }
+
+        /* event date badge gently pulses */
+        .event-date { animation: badgeFloat 3s ease-in-out infinite; }
+        @keyframes badgeFloat {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-4px); }
+        }
+
+        /* animated underline for section tags */
+        .section-tag { position: relative; }
+        .section-tag::after {
+            content: ""; display: block; height: 2px; width: 0; margin: 6px auto 0;
+            background: var(--secondary); transition: width 0.8s ease 0.3s;
+        }
+        .reveal.visible .section-tag::after, .section-head.visible .section-tag::after { width: 40px; }
+
+
+        /* =========================================================
+           MEDICAL ANIMATIONS
+        ========================================================= */
+
+        /* medical icons rising in the hero */
+        .med-float { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        .med-float span {
+            position: absolute; bottom: -60px; left: var(--x);
+            font-size: var(--s); opacity: 0;
+            animation: riseUp var(--d) linear infinite; animation-delay: var(--delay);
+            filter: drop-shadow(0 4px 8px rgba(22,77,50,0.18));
+        }
+        @keyframes riseUp {
+            0%   { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            10%  { opacity: 0.55; }
+            50%  { transform: translateY(-55vh) rotate(25deg) scale(1.05); }
+            90%  { opacity: 0.45; }
+            100% { transform: translateY(-115vh) rotate(-20deg) scale(0.9); opacity: 0; }
+        }
+
+        /* faint medical crosses drifting over the whole page */
+        .med-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .med-bg i {
+            position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s);
+            opacity: 0.13; animation: crossDrift var(--d) ease-in-out infinite; animation-delay: var(--delay);
+        }
+        .med-bg i::before, .med-bg i::after {
+            content: ""; position: absolute; background: var(--primary-light); border-radius: 3px;
+        }
+        .med-bg i::before { left: 38%; width: 24%; top: 0; height: 100%; }
+        .med-bg i::after  { top: 38%; height: 24%; left: 0; width: 100%; }
+        @keyframes crossDrift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50%      { transform: translate(30px, -45px) rotate(90deg); }
+        }
+        header, section, footer { position: relative; z-index: 1; }
+        header { position: fixed; }
+
+        /* heart-monitor line on the hero card */
+        .monitor { position: absolute; top: 28px; left: 28px; width: 62%; height: 70px; z-index: 2; }
+        .monitor path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
+        .monitor .base { stroke: rgba(255,255,255,0.22); }
+        .monitor .live {
+            stroke: #d9e99d; stroke-dasharray: 110 700; stroke-dashoffset: 810;
+            animation: monitorRun 3s linear infinite;
+            filter: drop-shadow(0 0 6px rgba(217,233,157,0.9));
+        }
+        @keyframes monitorRun { to { stroke-dashoffset: 0; } }
+
+        /* beating heart with ripples */
+        .heart-beat {
+            position: absolute; right: 8px; bottom: 120px; width: 62px; height: 62px; z-index: 4;
+            display: grid; place-items: center; font-size: 30px;
+        }
+        .heart-beat::before, .heart-beat::after {
+            content: ""; position: absolute; inset: 0; border-radius: 50%;
+            border: 2px solid #e0556b; animation: ripple 1.8s ease-out infinite;
+        }
+        .heart-beat::after { animation-delay: 0.9s; }
+        .heart-beat b { font-weight: normal; animation: heartbeat 1.2s ease-in-out infinite; display: block; }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.18); }
+            60% { transform: scale(1); }
+        }
+        @keyframes ripple {
+            0%   { transform: scale(0.7); opacity: 0.9; }
+            100% { transform: scale(1.9); opacity: 0; }
+        }
+
+        /* pulse ring around the header logo */
+        .logo-image { position: relative; overflow: visible; }
+        .logo-image::after {
+            content: ""; position: absolute; inset: -4px; border-radius: 50%;
+            border: 2px solid var(--secondary); animation: ripple 2.6s ease-out infinite;
+        }
+        .logo-image img { border-radius: 50%; }
+
+        /* DNA double helix in the About section */
+        .about { position: relative; overflow: hidden; }
+        .about > .container { position: relative; z-index: 2; }
+        .dna {
+            position: absolute; right: 8px; top: 6%; width: 64px; height: 88%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            opacity: 0.28; z-index: 1; pointer-events: none;
+        }
+        .dna-row { position: relative; height: 2px; width: 100%; }
+        .dna-row::before {
+            content: ""; position: absolute; left: 8px; right: 8px; top: 0; height: 2px;
+            background: var(--primary-light); opacity: 0.5; border-radius: 2px;
+            animation: dnaBar 3s ease-in-out infinite; animation-delay: calc(var(--i) * -0.22s);
+        }
+        .dna-row i {
+            position: absolute; top: -6px; width: 14px; height: 14px; border-radius: 50%;
+            background: var(--primary-light); animation: dnaDot 3s ease-in-out infinite;
+            animation-delay: calc(var(--i) * -0.22s);
+        }
+        .dna-row i:nth-child(2) { background: var(--secondary); animation-direction: reverse; }
+        @keyframes dnaDot {
+            0%, 100% { left: 0; transform: scale(0.7); }
+            50%      { left: calc(100% - 14px); transform: scale(1.3); }
+        }
+        @keyframes dnaBar { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.05); } }
+
+        @media (max-width: 1250px) { .dna { display: none; } }
+        @media (max-width: 700px) { .heart-beat { display: none; } .med-float span:nth-child(n+6) { display: none; } }
+
+        /* event card: glowing outline + register link nudge */
+        .event-card { position: relative; }
+        .event-card::before {
+            content: ""; position: absolute; inset: -2px; border-radius: 24px; z-index: -1;
+            background: conic-gradient(from 0deg, var(--secondary), transparent 30%, var(--primary-light), transparent 70%, var(--secondary));
+            opacity: 0; transition: opacity 0.4s; animation: spinGlow 4s linear infinite;
+        }
+        .event-card:hover::before { opacity: 0.7; }
+        @keyframes spinGlow { to { transform: rotate(360deg); } }
+        .event-link { transition: transform 0.3s ease; }
+        .event-card:hover .event-link { transform: translateX(6px); }
+
+        /* stat numbers pop when the counters run */
+        .stat h3 { display: inline-block; transition: transform 0.4s ease; }
+        .stat:hover h3 { transform: scale(1.15); }
+
+        /* gentle breathing on the hero card */
+        .hero-card { animation: breathe 7s ease-in-out infinite; }
+        @keyframes breathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.08); } }
+
+        /* respect users who prefer less motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .ecg path { stroke-dashoffset: 0; }
+            .med-float, .med-bg { display: none; }
+        }
+
     </style>
 
 </head>
@@ -2389,6 +2635,10 @@
     <!-- =========================================================
          PRELOADER
     ========================================================= -->
+
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <div class="med-bg" aria-hidden="true"><i style="--x:6%;--y:12%;--s:22px;--d:18s;--delay:-0s"></i><i style="--x:20%;--y:70%;--s:16px;--d:22s;--delay:-3s"></i><i style="--x:34%;--y:30%;--s:26px;--d:20s;--delay:-6s"></i><i style="--x:48%;--y:82%;--s:18px;--d:24s;--delay:-2s"></i><i style="--x:60%;--y:18%;--s:24px;--d:19s;--delay:-8s"></i><i style="--x:72%;--y:60%;--s:20px;--d:23s;--delay:-5s"></i><i style="--x:84%;--y:34%;--s:28px;--d:21s;--delay:-1s"></i><i style="--x:92%;--y:80%;--s:16px;--d:25s;--delay:-9s"></i><i style="--x:12%;--y:48%;--s:18px;--d:26s;--delay:-4s"></i><i style="--x:54%;--y:50%;--s:14px;--d:20s;--delay:-7s"></i></div>
 
     <div class="preloader" id="preloader">
 
@@ -2525,6 +2775,15 @@
             id="home"
         >
 
+            <div class="hero-blobs"><span></span><span></span><span></span></div>
+
+            <div class="med-float" aria-hidden="true"><span style="--x:8%;--s:38px;--d:32s;--delay:-0s">💊</span><span style="--x:18%;--s:30px;--d:36s;--delay:-3s">🧬</span><span style="--x:30%;--s:44px;--d:30s;--delay:-6s">🩺</span><span style="--x:44%;--s:34px;--d:34s;--delay:-1s">🫀</span><span style="--x:56%;--s:30px;--d:35s;--delay:-8s">🧪</span><span style="--x:68%;--s:38px;--d:31s;--delay:-4s">💉</span><span style="--x:80%;--s:42px;--d:29s;--delay:-10s">🔬</span><span style="--x:90%;--s:28px;--d:33s;--delay:-2s">🩸</span><span style="--x:12%;--s:36px;--d:34s;--delay:-12s">⚕️</span><span style="--x:74%;--s:26px;--d:38s;--delay:-7s">🦷</span></div>
+
+            <svg class="ecg" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 50 H200 L225 50 L245 15 L270 80 L295 30 L315 50 H520 L545 50 L565 5 L592 85 L618 25 L640 50 H860 L885 50 L905 18 L930 78 L955 32 L975 50 H1200"/>
+            </svg>
+
+
             <div class="container">
 
                 <div class="hero-grid">
@@ -2602,6 +2861,12 @@
 
                         <div class="hero-card">
 
+                            <svg class="monitor" viewBox="0 0 400 80" aria-hidden="true">
+                                <path class="base" d="M0 40 H60 L75 40 L90 10 L110 66 L128 22 L142 40 H220 L235 40 L250 6 L272 70 L290 24 L304 40 H400"/>
+                                <path class="live" d="M0 40 H60 L75 40 L90 10 L110 66 L128 22 L142 40 H220 L235 40 L250 6 L272 70 L290 24 L304 40 H400"/>
+                            </svg>
+
+
                             <div class="hero-card-content">
 
                                 <small>
@@ -2641,6 +2906,9 @@
                             </div>
 
                         </div>
+
+                        <div class="heart-beat" aria-hidden="true"><b>❤️</b></div>
+
 
 
                     </div>
@@ -2744,6 +3012,9 @@
             class="about"
             id="about"
         >
+
+            <div class="dna" aria-hidden="true"><div class="dna-row" style="--i:0"><i></i><i></i></div><div class="dna-row" style="--i:1"><i></i><i></i></div><div class="dna-row" style="--i:2"><i></i><i></i></div><div class="dna-row" style="--i:3"><i></i><i></i></div><div class="dna-row" style="--i:4"><i></i><i></i></div><div class="dna-row" style="--i:5"><i></i><i></i></div><div class="dna-row" style="--i:6"><i></i><i></i></div><div class="dna-row" style="--i:7"><i></i><i></i></div><div class="dna-row" style="--i:8"><i></i><i></i></div><div class="dna-row" style="--i:9"><i></i><i></i></div><div class="dna-row" style="--i:10"><i></i><i></i></div><div class="dna-row" style="--i:11"><i></i><i></i></div><div class="dna-row" style="--i:12"><i></i><i></i></div><div class="dna-row" style="--i:13"><i></i><i></i></div><div class="dna-row" style="--i:14"><i></i><i></i></div><div class="dna-row" style="--i:15"><i></i><i></i></div></div>
+
 
             <div class="container">
 
@@ -4432,6 +4703,21 @@
         }
 
 </script>
+
+
+    <script>
+        // Scroll progress bar
+        (function () {
+            const bar = document.getElementById('scrollProgress');
+            if (!bar) return;
+            function update() {
+                const h = document.documentElement.scrollHeight - window.innerHeight;
+                bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+            }
+            window.addEventListener('scroll', update, { passive: true });
+            update();
+        })();
+    </script>
 
 </body>
 
