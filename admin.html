@@ -76,6 +76,11 @@
                                 <textarea id="event-description" rows="4" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Décrivez l'événement..."></textarea>
                             </div>
                             <div>
+                                <label class="block text-xs text-slate-400 mb-1">Nombre maximum d'inscriptions</label>
+                                <input type="number" id="event-max" min="1" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="Illimité (laisser vide)">
+                                <p id="event-max-status" class="text-xs text-slate-400 mt-1"></p>
+                            </div>
+                            <div>
                                 <label class="block text-xs text-slate-400 mb-1">Image de l'événement</label>
                                 <img id="event-image-preview" alt="Aperçu" class="hidden w-full h-40 object-cover rounded-lg border border-slate-700 mb-2">
                                 <input type="file" id="event-image" accept="image/*" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600">
@@ -135,6 +140,8 @@
         const eventForm = document.getElementById('event-form');
         const EVENT_ID = 1; // the single event shown on the website
         const eventDescriptionInput = document.getElementById('event-description');
+        const eventMaxInput = document.getElementById('event-max');
+        const eventMaxStatus = document.getElementById('event-max-status');
         const eventImageInput = document.getElementById('event-image');
         const eventImagePreview = document.getElementById('event-image-preview');
         const eventSubmit = document.getElementById('event-submit');
@@ -170,8 +177,18 @@
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             loadEvent();
+            updateRegStatus();
             loadRegistrations();
             loadMessages();
+        }
+
+        async function updateRegStatus() {
+            const { data } = await supabaseClient.rpc('registration_status');
+            if (!data || !data.length) { eventMaxStatus.textContent = ''; return; }
+            const st = data[0];
+            eventMaxStatus.textContent = st.max_registrations === null
+                ? `${st.registered} inscription(s) — pas de limite`
+                : `${st.registered} / ${st.max_registrations} inscrits — ${st.is_open ? 'ouvert' : 'FERMÉ'}`;
         }
 
         async function loadEvent() {
@@ -180,6 +197,7 @@
                 eventTitleInput.value = data.title || '';
                 eventDateInput.value = data.event_date || '';
                 eventDescriptionInput.value = data.description || '';
+                eventMaxInput.value = data.max_registrations ?? '';
                 currentImageUrl = data.image_url || null;
                 if (currentImageUrl) {
                     eventImagePreview.src = currentImageUrl;
@@ -224,11 +242,13 @@
                         title: eventTitleInput.value,
                         event_date: eventDateInput.value,
                         description: eventDescriptionInput.value,
+                        max_registrations: eventMaxInput.value === '' ? null : parseInt(eventMaxInput.value, 10),
                         image_url
                     }]);
                 if (error) throw error;
 
                 currentImageUrl = image_url;
+                updateRegStatus();
                 eventImageInput.value = '';
                 eventMsg.className = 'text-xs text-emerald-400 mt-3';
                 eventMsg.textContent = 'Événement mis à jour avec succès !';
@@ -252,6 +272,7 @@
                 registrationsList.innerHTML = `<p class="text-slate-500 text-sm text-center py-8">Aucune inscription pour le moment.</p>`;
                 return;
             }
+            updateRegStatus();
             registrationsList.innerHTML = '';
             data.forEach(item => {
                 const card = document.createElement('div');
