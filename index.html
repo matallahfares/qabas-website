@@ -3313,7 +3313,8 @@
                 <div class="form-group"><label for="reg-event">Activity of interest</label><select id="reg-event" name="activity" class="form-control" required><option value="" disabled selected>Choose an activity</option><option>Scientific workshop</option><option>Conference / research day</option><option>Medical culture and community activity</option><option>Volunteer with QABAS</option><option>General club information</option></select></div>
               </div>
               <div class="form-group"><label for="reg-note">Note (optional)</label><textarea id="reg-note" name="note" class="form-control" rows="3" placeholder="Tell us anything we should know"></textarea></div>
-              <button type="submit" class="btn btn-primary" style="width:100%">Send Registration Request →</button>
+              <p id="reg-status" class="hidden" style="text-align:center;font-weight:700;font-size:14px;margin-bottom:14px"></p>
+              <button type="submit" id="reg-submit" class="btn btn-primary" style="width:100%">Send Registration Request →</button>
               <p id="reg-msg" class="text-xs text-emerald-400 mt-3 text-center hidden" style="margin-top:12px; font-weight:600;"></p>
               <p style="font-size:12px;color:var(--text-light);margin-top:12px">This is a request, not a confirmed booking. Please do not submit sensitive medical information.</p>
             </form>
@@ -4266,6 +4267,50 @@
           });
         });
 
+        // REGISTRATION LIMIT (set by the admin in admin.html)
+        let registrationOpen = true;
+
+        async function loadRegistrationStatus() {
+            const { data, error } = await supabaseClient.rpc('registration_status');
+            if (error || !data || !data.length) return;
+
+            const st = data[0];
+            registrationOpen = st.is_open;
+
+            const statusEl = document.getElementById('reg-status');
+            const submitBtn = document.getElementById('reg-submit');
+            const form = document.getElementById('registration-form');
+            const eventLink = document.querySelector('#events .event-link');
+
+            if (!st.is_open) {
+                statusEl.textContent = '🔒 Registration closed';
+                statusEl.style.color = '#ef4444';
+                statusEl.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Registration Closed';
+                submitBtn.style.opacity = '0.55';
+                submitBtn.style.cursor = 'not-allowed';
+                form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+                if (eventLink) { eventLink.textContent = 'Registration closed'; eventLink.removeAttribute('href'); }
+            } else {
+                if (st.max_registrations !== null) {
+                    const left = st.max_registrations - st.registered;
+                    statusEl.textContent = left + (left === 1 ? ' place left' : ' places left');
+                    statusEl.style.color = 'var(--primary-light)';
+                    statusEl.classList.remove('hidden');
+                } else {
+                    statusEl.classList.add('hidden');
+                }
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Registration Request →';
+                submitBtn.style.opacity = '';
+                submitBtn.style.cursor = '';
+                form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+            }
+        }
+
+        loadRegistrationStatus();
+
         // REGISTRATION FORM SUBMISSION TO SUPABASE
         const registrationForm = document.getElementById('registration-form');
         const regMsg = document.getElementById('reg-msg');
@@ -4274,6 +4319,7 @@
             registrationForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 regMsg.classList.add('hidden');
+                if (!registrationOpen) return;
 
                 const name = document.getElementById('reg-name').value;
                 const email = document.getElementById('reg-email').value;
@@ -4286,15 +4332,20 @@
                     .insert([{ name, email, study_year, activity, note }]);
 
                 if (error) {
-                    regMsg.textContent = 'Error: ' + error.message;
+                    const closed = (error.message || '').includes('REGISTRATION_CLOSED');
+                    regMsg.textContent = closed
+                        ? 'Sorry, registration is now closed. All places have been taken.'
+                        : 'Error: ' + error.message;
                     regMsg.className = 'text-xs text-red-400 mt-3 text-center';
                     regMsg.classList.remove('hidden');
+                    if (closed) loadRegistrationStatus();
                 } else {
                     regMsg.textContent = 'Registration submitted successfully to Supabase!';
                     regMsg.className = 'text-xs text-emerald-400 mt-3 text-center';
                     regMsg.classList.remove('hidden');
                     registrationForm.reset();
                     setTimeout(() => regMsg.classList.add('hidden'), 5000);
+                    loadRegistrationStatus();
                 }
             });
         }
