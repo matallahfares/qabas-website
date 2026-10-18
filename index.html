@@ -2373,10 +2373,7 @@
         /* Added QABAS improvements */
         .form-control { width:100%; box-sizing:border-box; }
         .form-control[hidden], [hidden] { display:none !important; }
-        #resources .event-link { display:inline-block; margin-top:10px; }
-        #resources .activity-card { min-width:0; }
         #register .contact-form { max-width:820px; margin-left:auto; margin-right:auto; }
-        #resources .form-control { border-radius:12px; }
 
 
         /* =========================================================
@@ -2612,6 +2609,88 @@
         .hero-card { animation: breathe 7s ease-in-out infinite; }
         @keyframes breathe { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.08); } }
 
+
+        /* =========================================================
+           HUMAN BODY ATLAS (3D)
+        ========================================================= */
+        #anatomy { background: var(--bg-2); overflow: hidden; }
+
+        .atlas {
+            background: radial-gradient(ellipse at 50% 30%, #1a2420 0%, #0c1210 70%);
+            border: 1px solid #25332c; border-radius: 28px; overflow: hidden;
+            box-shadow: var(--shadow-lg); color: #e8efe9;
+        }
+        .atlas-top { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; padding: 18px 24px; }
+        .atlas-title b { display: block; font-family: "Manrope", sans-serif; font-size: 18px; letter-spacing: -0.5px; }
+        .atlas-title span { font-size: 11px; color: #8fa397; letter-spacing: 1.5px; text-transform: uppercase; }
+        .atlas-count { font-size: 12px; color: #9fb2a6; }
+        .atlas-count b { color: #d9e99d; font-size: 14px; }
+        .atlas-chips { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+        .atlas-chips button, .atlas-views button, .atlas-organs button {
+            display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 50px;
+            background: #16201b; color: #cfdcd3; border: 1px solid #2a3a31; font-size: 13px; font-weight: 700;
+            transition: var(--transition);
+        }
+        .atlas-chips button:hover, .atlas-views button:hover, .atlas-organs button:hover { border-color: #a9c85a; transform: translateY(-2px); }
+        .atlas-chips button.on, .atlas-views button.on, .atlas-organs button.on { background: #28794e; border-color: #3a9c68; color: #fff; }
+        .atlas-chips button:disabled { opacity: 0.4; pointer-events: none; }
+
+        .atlas-view { position: relative; height: clamp(420px, 68vh, 700px); cursor: grab; }
+        .atlas-view:active { cursor: grabbing; }
+        .atlas-view canvas { display: block; width: 100%; height: 100%; outline: none; }
+        .atlas-msg { position: absolute; inset: 0; display: grid; place-items: center; color: #8fa397; font-size: 14px; pointer-events: none; text-align: center; padding: 20px; }
+        .atlas-hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; font-size: 11px; color: #6f8478; pointer-events: none; letter-spacing: 0.5px; }
+        .atlas-back {
+            position: absolute; top: 12px; left: 18px; z-index: 3; padding: 9px 16px; border-radius: 12px;
+            background: rgba(22, 32, 27, 0.9); color: #d9e99d; border: 1px solid #3a9c68; font-weight: 700; font-size: 13px;
+        }
+        .atlas-back[hidden] { display: none; }
+
+        .atlas-callouts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .callout { position: absolute; left: 0; top: 0; will-change: transform; }
+        .callout .dot {
+            position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%;
+            background: #3b82f6; border: 2px solid #fff; box-shadow: 0 0 0 0 rgba(59,130,246,0.7); animation: calloutPulse 1.8s infinite;
+        }
+        .callout .box {
+            position: absolute; left: 18px; top: -22px; min-width: 150px; max-width: 220px; padding: 8px 12px;
+            background: rgba(10, 16, 13, 0.88); border: 1px solid #2f4538; border-radius: 10px; backdrop-filter: blur(6px);
+        }
+        .callout .box b { display: block; font-size: 12px; color: #fff; }
+        .callout .box span { display: block; font-size: 10.5px; color: #9fb2a6; line-height: 1.35; margin-top: 2px; }
+        @keyframes calloutPulse { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.7); } 100% { box-shadow: 0 0 0 14px rgba(59,130,246,0); } }
+
+        .atlas-panel {
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 30px;
+            margin: 0 18px; padding: 16px 20px; border-radius: 18px; background: #131c17; border: 1px solid #25332c;
+        }
+        .atlas-views { display: flex; gap: 8px; flex-wrap: wrap; }
+        .atlas-spread { flex: 1; min-width: 240px; max-width: 460px; }
+        .atlas-spread label { display: block; font-size: 12px; font-weight: 700; color: #cfdcd3; margin-bottom: 8px; }
+        .spread-row { display: flex; align-items: center; gap: 12px; }
+        .spread-row small { font-size: 10.5px; color: #7f9487; }
+        .spread-row input[type=range] { flex: 1; accent-color: #3b82f6; height: 6px; cursor: pointer; }
+        .atlas-panel.disabled .atlas-spread { opacity: 0.35; pointer-events: none; }
+
+        .atlas-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px 18px 22px; align-items: start; }
+        .atlas-organs { display: flex; flex-wrap: wrap; gap: 10px; }
+        .atlas-info { background: #131c17; border: 1px solid #25332c; border-radius: 18px; padding: 22px 24px; min-height: 190px; }
+        .atlas-info small { color: #a9c85a; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 10.5px; }
+        .atlas-info h3 { font-family: "Manrope", sans-serif; font-size: 26px; letter-spacing: -0.8px; margin: 4px 0 8px; color: #fff; }
+        .atlas-info p { color: #9fb2a6; font-size: 13.5px; margin-bottom: 12px; }
+        .atlas-info ul { display: grid; gap: 7px; }
+        .atlas-info li { position: relative; padding-left: 22px; font-size: 12.5px; font-weight: 600; color: #dbe6de; }
+        .atlas-info li::before { content: "✚"; position: absolute; left: 0; color: #a9c85a; }
+        .atlas-info.swap > * { animation: cardSwap 0.45s ease both; }
+        @keyframes cardSwap { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 900px) {
+            .atlas-bottom { grid-template-columns: 1fr; }
+            .atlas-chips { margin-left: 0; }
+            .atlas-view { height: clamp(360px, 60vh, 520px); }
+            .callout .box { max-width: 160px; }
+        }
+
         /* respect users who prefer less motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -2712,8 +2791,8 @@
                         Gallery
                     </a>
 
-                    <a href="#resources">
-                        Resources
+                    <a href="#anatomy">
+                        Anatomy
                     </a>
 
                     <a href="#register">
@@ -3592,20 +3671,66 @@
         </section>
 
         <!-- =====================================================
-             SCIENTIFIC RESOURCES
+             HUMAN BODY ATLAS (3D)
         ====================================================== -->
-        <section id="resources">
+        <section id="anatomy">
           <div class="container">
             <div class="section-head reveal">
-              <span class="section-tag">Keep learning</span>
-              <h2>Scientific Resources</h2>
-              <p>Useful starting points for evidence-based learning, medical research and discovering scientific literature.</p>
+              <span class="section-tag">Learn anatomy</span>
+              <h2>Explore the Human Body in 3D</h2>
+              <p>Drag to rotate, spread the structures apart, switch systems on and off, and tap any bone, muscle or organ to learn about it.</p>
             </div>
-            <div class="form-group reveal" style="max-width:520px;margin:0 auto 28px"><label for="resourceSearch">Search resources</label><input id="resourceSearch" class="form-control" type="search" placeholder="Try: research, health, literature" aria-label="Search scientific resources"></div>
-            <div class="activity-grid" id="resourceCards">
-              <article class="activity-card reveal"><div class="activity-icon">📚</div><h3>PubMed</h3><p>Search biomedical literature, reviews and research articles.</p><a class="event-link" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">Explore PubMed ↗</a></article>
-              <article class="activity-card reveal"><div class="activity-icon">🌍</div><h3>World Health Organization</h3><p>Find public-health guidance, reports and health topic explainers.</p><a class="event-link" href="https://www.who.int/" target="_blank" rel="noopener noreferrer">Visit WHO ↗</a></article>
-              <article class="activity-card reveal"><div class="activity-icon">🔎</div><h3>Google Scholar</h3><p>Discover academic papers, citations and research across disciplines.</p><a class="event-link" href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">Search Scholar ↗</a></article>
+
+            <div class="atlas reveal" id="atlas">
+
+              <div class="atlas-top">
+                <div class="atlas-title"><b>QABAS Body Atlas</b><span>3D simulation</span></div>
+                <div class="atlas-count">Visible structures: <b id="atlasCount">0</b></div>
+                <div class="atlas-chips" id="atlasChips">
+                  <button type="button" class="on" data-sys="skeleton" aria-pressed="true">🦴 Skeleton</button>
+                  <button type="button" class="on" data-sys="muscle" aria-pressed="true">💪 Muscles</button>
+                  <button type="button" data-sys="organ" aria-pressed="false">🫀 Organs</button>
+                </div>
+              </div>
+
+              <div class="atlas-view" id="atlasView">
+                <div class="atlas-msg" id="atlasMsg">Loading 3D body…</div>
+                <div class="atlas-callouts" id="atlasCallouts"></div>
+                <button type="button" class="atlas-back" id="atlasBack" hidden>↺ Back to whole body</button>
+                <div class="atlas-hint">Drag to rotate · Scroll to zoom · Tap a structure</div>
+              </div>
+
+              <div class="atlas-panel">
+                <div class="atlas-views" id="atlasViews">
+                  <button type="button" data-view="front">Front</button>
+                  <button type="button" data-view="back">Back</button>
+                  <button type="button" data-view="side">Side</button>
+                  <button type="button" data-view="perspective" class="on">Perspective</button>
+                </div>
+                <div class="atlas-spread">
+                  <label for="atlasSpread">Spread structures apart</label>
+                  <div class="spread-row"><small>Assembled</small><input type="range" id="atlasSpread" min="0" max="100" value="0"><small>Spread</small></div>
+                </div>
+              </div>
+
+              <div class="atlas-bottom">
+                <div class="atlas-organs" id="atlasOrgans">
+                  <button type="button" data-organ="brain"><span>🧠</span> Brain</button>
+                  <button type="button" data-organ="heart"><span>❤️</span> Heart</button>
+                  <button type="button" data-organ="lungs"><span>🫁</span> Lungs</button>
+                  <button type="button" data-organ="liver"><span>🟤</span> Liver</button>
+                  <button type="button" data-organ="stomach"><span>🟠</span> Stomach</button>
+                  <button type="button" data-organ="kidneys"><span>🫘</span> Kidneys</button>
+                  <button type="button" data-organ="intestines"><span>🌀</span> Intestines</button>
+                </div>
+                <div class="atlas-info" id="atlasInfo">
+                  <small id="infoTag">Welcome</small>
+                  <h3 id="infoName">The human body</h3>
+                  <p id="infoText">Choose an organ below to isolate it, or tap any structure on the model to identify it.</p>
+                  <ul id="infoFacts"></ul>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -4518,17 +4643,6 @@
 
 
     
-        // Resource search: filters the resource cards as the user types.
-        const resourceSearch = document.getElementById("resourceSearch");
-        if (resourceSearch) {
-          resourceSearch.addEventListener("input", () => {
-            const query = resourceSearch.value.trim().toLowerCase();
-            document.querySelectorAll("#resourceCards .activity-card").forEach(card => {
-              card.hidden = !card.textContent.toLowerCase().includes(query);
-            });
-          });
-        }
-
         // Mobile navigation closes after a section link is selected.
         document.querySelectorAll("#navLinks a").forEach(link => {
           link.addEventListener("click", () => {
@@ -4718,6 +4832,495 @@
         })();
     </script>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+// QABAS BODY ATLAS: interactive 3D anatomy (built with three.js)
+(function () {
+    const root = document.getElementById('atlas');
+    if (!root) return;
+    const wrap = document.getElementById('atlasView');
+    const msg = document.getElementById('atlasMsg');
+
+    if (!window.THREE || !THREE.OrbitControls) {
+        msg.textContent = '3D viewer could not load. Please check your internet connection and refresh.';
+        return;
+    }
+    let renderer;
+    try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (e) {
+        msg.textContent = 'Your device or browser does not support 3D graphics.';
+        return;
+    }
+
+    // ---------- scene ----------
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    wrap.insertBefore(renderer.domElement, wrap.firstChild);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 50);
+    camera.position.set(1.8, 1.3, 2.5);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0.9, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.minDistance = 0.3;
+    controls.maxDistance = 6;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.1;
+    controls.enableZoom = false;                       // enabled only after the visitor clicks the model, so page scrolling still works
+    renderer.domElement.style.touchAction = 'pan-y';   // vertical swipes scroll the page, horizontal swipes rotate
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x223344, 0.95));
+    const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(2, 3, 3); scene.add(key);
+    const rim = new THREE.DirectionalLight(0x9bd0ff, 0.45); rim.position.set(-3, 1.5, -3); scene.add(rim);
+
+    // floor disc
+    const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(0.75, 48),
+        new THREE.MeshBasicMaterial({ color: 0x1d2a24, transparent: true, opacity: 0.8 })
+    );
+    floor.rotation.x = -Math.PI / 2; floor.position.y = -0.005; scene.add(floor);
+    const ring = new THREE.Mesh(
+        new THREE.RingGeometry(0.72, 0.75, 64),
+        new THREE.MeshBasicMaterial({ color: 0x3a9c68, transparent: true, opacity: 0.7, side: THREE.DoubleSide })
+    );
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0; scene.add(ring);
+
+    const world = new THREE.Group();
+    scene.add(world);
+
+    // ---------- model helpers ----------
+    const Y = new THREE.Vector3(0, 1, 0);
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    const parts = [];
+    const COLORS = { bone: 0xe9e0c8, muscle: 0xc4503b, muscle2: 0xd8664f };
+
+    function addPart(o) {
+        o.geo.computeBoundingBox();
+        const c = new THREE.Vector3();
+        o.geo.boundingBox.getCenter(c);
+        o.geo.translate(-c.x, -c.y, -c.z);
+        o.geo.computeBoundingBox();
+        const size = new THREE.Vector3();
+        o.geo.boundingBox.getSize(size);
+        const material = new THREE.MeshStandardMaterial({ color: o.color, roughness: 0.55, metalness: 0.05, transparent: true });
+        const mesh = new THREE.Mesh(o.geo, material);
+        mesh.position.copy(c);
+        world.add(mesh);
+        const p = {
+            mesh, sys: o.sys, organ: o.organ || null, name: o.name, desc: o.desc || '',
+            home: c.clone(), gridQuat: o.gridQuat || new THREE.Quaternion(),
+            maxDim: Math.max(size.x, size.y, size.z), label: !!o.label,
+            vis: true, op: 1, targetOp: 1, grid: new THREE.Vector3(), gs: 1
+        };
+        mesh.userData.part = p;
+        parts.push(p);
+        return p;
+    }
+    function between(a, b) {
+        const dir = new THREE.Vector3().subVectors(b, a);
+        return {
+            len: dir.length(),
+            center: a.clone().add(b).multiplyScalar(0.5),
+            q: new THREE.Quaternion().setFromUnitVectors(Y, dir.clone().normalize())
+        };
+    }
+    function lathe(pts) { return new THREE.LatheGeometry(pts.map(p => new THREE.Vector2(p[0], p[1])), 14); }
+    function place(geo, a, b) {
+        const { center, q } = between(a, b);
+        geo.applyQuaternion(q);
+        geo.translate(center.x, center.y, center.z);
+        return q;
+    }
+    function bone(name, desc, a, b, rs, re) {
+        const h = a.distanceTo(b) / 2;
+        const geo = lathe([[0, -h], [re * 0.75, -h + re * 0.25], [re, -h + re * 0.9], [rs, -h + re * 2.3], [rs, h - re * 2.3], [re, h - re * 0.9], [re * 0.75, h - re * 0.25], [0, h]]);
+        const q = place(geo, a, b);
+        return addPart({ geo, sys: 'skeleton', name, desc, color: COLORS.bone, gridQuat: q.clone().invert() });
+    }
+    function muscle(name, desc, a, b, r, tint) {
+        const h = a.distanceTo(b) / 2, L = h * 2, pts = [[0, -h]];
+        for (let i = 0; i <= 8; i++) {
+            const t = i / 8;
+            pts.push([r * (0.14 + 0.86 * Math.pow(Math.sin(Math.PI * t), 0.8)), -h + L * t]);
+        }
+        pts.push([0, h]);
+        const geo = lathe(pts);
+        const q = place(geo, a, b);
+        return addPart({ geo, sys: 'muscle', name, desc, color: tint ? COLORS.muscle2 : COLORS.muscle, gridQuat: q.clone().invert() });
+    }
+    function ell(o) {
+        const geo = new THREE.SphereGeometry(1, 24, 16);
+        geo.scale(o.s[0], o.s[1], o.s[2]);
+        const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(o.r ? o.r[0] : 0, o.r ? o.r[1] : 0, o.r ? o.r[2] : 0));
+        geo.applyQuaternion(q);
+        geo.translate(o.c[0], o.c[1], o.c[2]);
+        return addPart({ geo, sys: o.sys, organ: o.organ, name: o.name, desc: o.desc, color: o.color, label: o.label, gridQuat: q.clone().invert() });
+    }
+    const sideName = s => (s > 0 ? 'Left' : 'Right');   // person's left = +x (viewer's right from the front)
+
+    // ---------- SKELETON ----------
+    ell({ sys: 'skeleton', name: 'Skull', desc: 'Protects the brain and forms the shape of the face.', c: [0, 1.66, 0], s: [0.085, 0.1, 0.098], color: COLORS.bone });
+    ell({ sys: 'skeleton', name: 'Mandible (jaw)', desc: 'The only movable bone of the skull; it lets you chew and speak.', c: [0, 1.588, 0.045], s: [0.056, 0.03, 0.055], color: COLORS.bone });
+
+    for (let i = 0; i < 24; i++) {
+        const t = i / 23, y = 1.53 - t * 0.56, z = -0.035 - 0.025 * Math.sin(t * Math.PI * 2.2), r = 0.014 + 0.016 * t;
+        const geo = new THREE.CylinderGeometry(r, r * 1.08, 0.019, 12);
+        geo.translate(0, y, z);
+        const nm = i < 7 ? 'C' + (i + 1) : i < 19 ? 'T' + (i - 6) : 'L' + (i - 18);
+        const ds = i < 7 ? 'Cervical vertebra: supports the skull and allows the neck to move.' :
+                   i < 19 ? 'Thoracic vertebra: connects to a pair of ribs.' :
+                            'Lumbar vertebra: carries most of the body\'s weight.';
+        addPart({ geo, sys: 'skeleton', name: 'Vertebra ' + nm, desc: ds, color: COLORS.bone });
+    }
+    ell({ sys: 'skeleton', name: 'Sacrum', desc: 'Triangular bone at the base of the spine, joined to the pelvis.', c: [0, 0.93, -0.045], s: [0.045, 0.06, 0.02], color: COLORS.bone });
+
+    for (let i = 0; i < 12; i++) {
+        const R = 0.08 + 0.05 * Math.sin(Math.PI * (i / 11) * 0.85 + 0.12), arc = Math.PI * 1.45;
+        const geo = new THREE.TorusGeometry(R, 0.0065, 8, 44, arc);
+        geo.rotateX(Math.PI / 2);
+        geo.rotateY(-(Math.PI / 2 - arc / 2));
+        geo.scale(1.3, 1, 0.84);
+        geo.translate(0, 1.46 - i * 0.036, 0.0);
+        addPart({
+            geo, sys: 'skeleton', name: 'Rib pair ' + (i + 1),
+            desc: i < 7 ? 'True rib: joins the sternum directly and protects the heart and lungs.' : i < 10 ? 'False rib: joins the sternum through cartilage.' : 'Floating rib: free at the front.',
+            color: COLORS.bone, gridQuat: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+        });
+    }
+    ell({ sys: 'skeleton', name: 'Sternum', desc: 'The breastbone; it anchors the ribs at the front.', c: [0, 1.36, 0.112], s: [0.03, 0.095, 0.01], color: COLORS.bone });
+
+    [1, -1].forEach(s => {
+        const side = sideName(s);
+        bone(side + ' clavicle', 'The collarbone; it connects the arm to the trunk.', V(s * 0.02, 1.5, 0.07), V(s * 0.175, 1.49, 0.02), 0.007, 0.011);
+        ell({ sys: 'skeleton', name: side + ' scapula', desc: 'The shoulder blade; it gives the arm its range of motion.', c: [s * 0.13, 1.37, -0.075], s: [0.05, 0.075, 0.011], r: [0, s * 0.3, 0], color: COLORS.bone });
+        bone(side + ' humerus', 'The long bone of the upper arm.', V(s * 0.195, 1.48, 0), V(s * 0.215, 1.19, 0), 0.013, 0.02);
+        bone(side + ' radius', 'Forearm bone on the thumb side.', V(s * 0.215, 1.18, 0.012), V(s * 0.255, 0.94, 0.03), 0.009, 0.014);
+        bone(side + ' ulna', 'Forearm bone on the little-finger side.', V(s * 0.205, 1.18, -0.01), V(s * 0.245, 0.94, 0.0), 0.009, 0.013);
+        ell({ sys: 'skeleton', name: side + ' hand', desc: 'Carpal and metacarpal bones of the hand.', c: [s * 0.27, 0.9, 0.025], s: [0.032, 0.05, 0.013], r: [0, 0, s * 0.18], color: COLORS.bone });
+        for (let j = 0; j < 5; j++) {
+            const xo = (j - 2) * 0.013 * s;
+            bone(side + ' finger ' + (j + 1), 'Phalanges: the small bones of the fingers.', V(s * 0.272 + xo, 0.86, 0.028), V(s * 0.277 + xo * 1.3, 0.79 - (j === 2 ? 0.01 : 0) + (j === 0 || j === 4 ? 0.02 : 0), 0.028), 0.0045, 0.006);
+        }
+        ell({ sys: 'skeleton', name: side + ' ilium', desc: 'The wing of the hip bone.', c: [s * 0.1, 0.96, 0.0], s: [0.09, 0.075, 0.045], r: [0, 0, s * 0.5], color: COLORS.bone });
+        bone(side + ' femur', 'The longest and strongest bone of the body.', V(s * 0.085, 0.89, 0), V(s * 0.1, 0.5, 0.012), 0.017, 0.028);
+        ell({ sys: 'skeleton', name: side + ' patella', desc: 'The kneecap; it protects the knee joint.', c: [s * 0.1, 0.49, 0.045], s: [0.02, 0.025, 0.012], color: COLORS.bone });
+        bone(side + ' tibia', 'The shin bone; it carries the weight of the body.', V(s * 0.1, 0.47, 0.012), V(s * 0.1, 0.07, 0.0), 0.014, 0.024);
+        bone(side + ' fibula', 'The slender bone beside the tibia.', V(s * 0.13, 0.45, 0.0), V(s * 0.125, 0.08, -0.005), 0.008, 0.013);
+        ell({ sys: 'skeleton', name: side + ' foot', desc: 'Tarsal and metatarsal bones that support the body when standing.', c: [s * 0.1, 0.03, 0.07], s: [0.038, 0.026, 0.092], color: COLORS.bone });
+    });
+    ell({ sys: 'skeleton', name: 'Pubic bone', desc: 'The front part of the pelvis.', c: [0, 0.84, 0.06], s: [0.06, 0.02, 0.015], color: COLORS.bone });
+
+    // ---------- MUSCLES ----------
+    [1, -1].forEach(s => {
+        const side = sideName(s);
+        ell({ sys: 'muscle', name: side + ' pectoralis major', desc: 'Large chest muscle that pulls the arm across the body.', c: [s * 0.09, 1.4, 0.115], s: [0.095, 0.06, 0.03], r: [0, 0, s * -0.15], color: COLORS.muscle });
+        muscle(side + ' deltoid', 'The rounded shoulder muscle; it lifts the arm.', V(s * 0.2, 1.51, 0.0), V(s * 0.225, 1.38, 0.0), 0.052, true);
+        muscle(side + ' biceps brachii', 'Bends the elbow and turns the forearm.', V(s * 0.215, 1.38, 0.04), V(s * 0.225, 1.23, 0.035), 0.032, false);
+        muscle(side + ' triceps brachii', 'Straightens the elbow.', V(s * 0.205, 1.4, -0.035), V(s * 0.22, 1.22, -0.03), 0.034, true);
+        muscle(side + ' forearm flexors', 'Bend the wrist and fingers.', V(s * 0.232, 1.19, 0.01), V(s * 0.255, 0.96, 0.025), 0.03, false);
+        ell({ sys: 'muscle', name: side + ' rectus abdominis', desc: 'The "six-pack" muscle; it bends the trunk forward.', c: [s * 0.036, 1.1, 0.108], s: [0.038, 0.16, 0.022], color: COLORS.muscle2 });
+        ell({ sys: 'muscle', name: side + ' external oblique', desc: 'Rotates and bends the trunk sideways.', c: [s * 0.125, 1.16, 0.075], s: [0.05, 0.14, 0.035], r: [0, 0, s * 0.12], color: COLORS.muscle });
+        ell({ sys: 'muscle', name: side + ' serratus anterior', desc: 'Holds the shoulder blade against the ribcage.', c: [s * 0.15, 1.32, 0.05], s: [0.028, 0.085, 0.05], r: [0, 0, s * 0.1], color: 0xe88a96 });
+        ell({ sys: 'muscle', name: side + ' trapezius', desc: 'Moves and steadies the shoulder blade and neck.', c: [s * 0.075, 1.45, -0.085], s: [0.095, 0.11, 0.025], color: COLORS.muscle2 });
+        ell({ sys: 'muscle', name: side + ' latissimus dorsi', desc: 'The broad back muscle; it pulls the arm down and back.', c: [s * 0.11, 1.2, -0.085], s: [0.075, 0.17, 0.026], r: [0, 0, s * 0.12], color: COLORS.muscle });
+        muscle(side + ' sternocleidomastoid', 'Turns and tilts the head.', V(s * 0.035, 1.575, 0.015), V(s * 0.012, 1.5, 0.075), 0.011, false);
+        ell({ sys: 'muscle', name: side + ' gluteus maximus', desc: 'The largest muscle of the body; it extends the hip.', c: [s * 0.08, 0.93, -0.075], s: [0.085, 0.08, 0.06], color: COLORS.muscle2 });
+        muscle(side + ' quadriceps femoris', 'Four-part muscle that straightens the knee.', V(s * 0.1, 0.87, 0.045), V(s * 0.1, 0.54, 0.045), 0.056, false);
+        muscle(side + ' hamstrings', 'Bend the knee and extend the hip.', V(s * 0.1, 0.86, -0.035), V(s * 0.1, 0.56, -0.03), 0.046, true);
+        muscle(side + ' gastrocnemius', 'The calf muscle; it points the foot downward.', V(s * 0.1, 0.45, -0.035), V(s * 0.1, 0.23, -0.02), 0.041, false);
+        muscle(side + ' tibialis anterior', 'Lifts the foot upward.', V(s * 0.1, 0.44, 0.04), V(s * 0.1, 0.15, 0.03), 0.025, true);
+    });
+
+    // ---------- ORGANS ----------
+    ell({ sys: 'organ', organ: 'brain', name: 'Brain', desc: 'The control centre of the nervous system.', c: [0, 1.678, 0.0], s: [0.07, 0.062, 0.085], color: 0xe9a2b4, label: true });
+    [1, -1].forEach(s => {
+        ell({ sys: 'organ', organ: 'lungs', name: sideName(s) + ' lung', desc: s > 0 ? 'Has 2 lobes; shares the chest with the heart.' : 'Has 3 lobes.', c: [s * 0.085, 1.33, 0.0], s: [0.065, 0.115, 0.075], r: [0, 0, s * 0.08], color: 0xe07a68 });
+        {
+            const a = V(s * 0.012, 1.42, 0.015), b = V(s * 0.06, 1.34, 0.01), h = a.distanceTo(b) / 2;
+            const geo = lathe([[0, -h], [0.008, -h], [0.008, h], [0, h]]);
+            const q = place(geo, a, b);
+            addPart({ geo, sys: 'organ', organ: 'lungs', name: sideName(s) + ' main bronchus', desc: 'Carries air into the lung.', color: 0xe9c3c0, gridQuat: q.clone().invert() });
+        }
+        ell({ sys: 'organ', organ: 'kidneys', name: sideName(s) + ' kidney', desc: 'Filters the blood and makes urine.', c: [s * 0.05, 1.1, -0.055], s: [0.02, 0.04, 0.02], color: 0x8a3b3b });
+    });
+    {
+        // trachea with cartilage rings
+        const a = V(0, 1.53, 0.012), b = V(0, 1.42, 0.012);
+        const h = a.distanceTo(b) / 2, pts = [[0, -h]];
+        for (let i = 0; i <= 11; i++) { pts.push([0.0105 + (i % 2 ? 0.0025 : 0), -h + (i / 11) * h * 2]); }
+        pts.push([0, h]);
+        const geo = lathe(pts);
+        const q = place(geo, a, b);
+        addPart({ geo, sys: 'organ', organ: 'lungs', name: 'Trachea', desc: 'Carries air down from the throat.', color: 0xe9c3c0, label: true, gridQuat: q.clone().invert() });
+    }
+    ell({ sys: 'organ', organ: 'heart', name: 'Heart', desc: 'Pumps blood around the body.', c: [0.022, 1.3, 0.05], s: [0.045, 0.058, 0.042], r: [0, 0, -0.5], color: 0xc2354a, label: true });
+    {
+        const a = V(0.005, 1.345, 0.045), b = V(0.0, 1.43, 0.035), h = a.distanceTo(b) / 2;
+        const geo = lathe([[0, -h], [0.012, -h], [0.012, h], [0, h]]);
+        const q = place(geo, a, b);
+        addPart({ geo, sys: 'organ', organ: 'heart', name: 'Aorta', desc: 'The largest artery; it carries oxygen-rich blood from the heart.', color: 0xd9556b, label: true, gridQuat: q.clone().invert() });
+    }
+    ell({ sys: 'organ', organ: 'liver', name: 'Liver', desc: 'Filters the blood and produces bile.', c: [-0.07, 1.17, 0.04], s: [0.095, 0.048, 0.058], r: [0, 0, 0.1], color: 0x8a4b32, label: true });
+    ell({ sys: 'organ', organ: 'stomach', name: 'Stomach', desc: 'Churns food with acid and enzymes.', c: [0.065, 1.185, 0.045], s: [0.05, 0.055, 0.04], r: [0, 0, 0.6], color: 0xd99a6c, label: true });
+    ell({ sys: 'organ', organ: 'spleen', name: 'Spleen', desc: 'Filters old red blood cells and supports immunity.', c: [0.115, 1.2, -0.03], s: [0.02, 0.04, 0.022], color: 0x7b4a8a });
+    {
+        const pts = [];
+        for (let r = 0; r < 4; r++) {
+            const y = 1.075 - r * 0.042, dir = r % 2 ? -1 : 1;
+            for (let k = 0; k <= 4; k++) pts.push(V(dir * (-0.085 + k * 0.0425), y + 0.006 * Math.sin(k * 2), 0.045 + 0.008 * Math.sin(k + r)));
+        }
+        const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.0145, 8, false);
+        addPart({ geo, sys: 'organ', organ: 'intestines', name: 'Intestines', desc: 'Absorb nutrients and water from food.', color: 0xe3a28a, label: true });
+    }
+    ell({ sys: 'organ', organ: 'bladder', name: 'Bladder', desc: 'Stores urine until it is released.', c: [0, 0.885, 0.045], s: [0.032, 0.03, 0.03], color: 0xd8c06a });
+
+    // ---------- grid layout for the fully spread view ----------
+    {
+        const order = { skeleton: 0, muscle: 1, organ: 2 };
+        const sorted = parts.slice().sort((a, b) => order[a.sys] - order[b.sys] || b.home.y - a.home.y);
+        const cols = 14, step = 0.15, rows = Math.ceil(sorted.length / cols);
+        sorted.forEach((p, i) => {
+            const col = i % cols, row = Math.floor(i / cols);
+            p.grid.set((col - (cols - 1) / 2) * step, 0.95 + ((rows - 1) / 2 - row) * step, 0);
+            p.gs = Math.min(1, 0.125 / p.maxDim);
+        });
+    }
+
+    // ---------- organ info ----------
+    const ORGANS = {
+        brain: { name: 'Brain', tag: 'Nervous system', text: 'The control centre of the body. It processes the senses, stores memory, controls movement and produces thought and emotion.', facts: ['About 86 billion neurons', 'Uses roughly 20% of the body\'s energy', 'Protected by the skull and three layers of meninges'] },
+        heart: { name: 'Heart', tag: 'Cardiovascular system', text: 'A muscular pump that sends blood through the lungs and the whole body, delivering oxygen and nutrients to every cell.', facts: ['Beats about 100,000 times a day', 'Four chambers: two atria and two ventricles', 'Resting adult rate: about 60–100 beats per minute'] },
+        lungs: { name: 'Lungs', tag: 'Respiratory system', text: 'They bring oxygen into the blood and remove carbon dioxide. Gas exchange happens in tiny air sacs called alveoli.', facts: ['Hundreds of millions of alveoli', 'Resting adult breathes about 12–20 times per minute', 'The right lung has 3 lobes, the left has 2'] },
+        liver: { name: 'Liver', tag: 'Digestive system', text: 'The body\'s chemical factory. It filters blood, makes bile, stores energy and processes medicines and toxins.', facts: ['The largest internal organ', 'Can regenerate after damage', 'Performs hundreds of vital functions'] },
+        stomach: { name: 'Stomach', tag: 'Digestive system', text: 'A muscular bag that churns food with acid and enzymes, starting the digestion of proteins.', facts: ['Stomach acid is strongly acidic (pH about 1.5–3.5)', 'Its lining renews every few days', 'Food stays there for a few hours'] },
+        kidneys: { name: 'Kidneys', tag: 'Urinary system', text: 'Two bean-shaped organs that filter the blood, remove waste and balance water and salts.', facts: ['About a million filtering units (nephrons) in each kidney', 'Filter roughly 180 litres of blood plasma a day', 'Each is about the size of a fist'] },
+        intestines: { name: 'Intestines', tag: 'Digestive system', text: 'The small intestine absorbs nutrients; the large intestine absorbs water and forms waste.', facts: ['Small intestine: about 6 metres long', 'Large intestine: about 1.5 metres long', 'Home to trillions of gut bacteria'] }
+    };
+    const SYS_TAG = { skeleton: 'Skeletal system', muscle: 'Muscular system', organ: 'Organ' };
+
+    // ---------- state ----------
+    const state = { sys: { skeleton: true, muscle: true, organ: false }, focus: null, selected: null };
+    const els = {
+        count: document.getElementById('atlasCount'), chips: [...document.querySelectorAll('#atlasChips button')],
+        views: [...document.querySelectorAll('#atlasViews button')], organs: [...document.querySelectorAll('#atlasOrgans button')],
+        spread: document.getElementById('atlasSpread'), panel: root.querySelector('.atlas-panel'),
+        back: document.getElementById('atlasBack'), callouts: document.getElementById('atlasCallouts'),
+        info: document.getElementById('atlasInfo'), tag: document.getElementById('infoTag'),
+        name: document.getElementById('infoName'), text: document.getElementById('infoText'), facts: document.getElementById('infoFacts')
+    };
+    let curT = 0, targetT = 0, shownCount = 0, tween = null, idleUntil = 0, active = false, callouts = [];
+
+    function applyVisibility() {
+        parts.forEach(p => {
+            let vis, op = 1;
+            if (state.focus) vis = p.organ === state.focus;
+            else {
+                vis = !!state.sys[p.sys];
+                if (p.sys !== 'organ' && state.sys.organ) op = p.sys === 'muscle' ? 0.14 : 0.26;
+            }
+            p.vis = vis; p.targetOp = vis ? op : 0;
+        });
+        els.chips.forEach(b => { const on = !!state.sys[b.dataset.sys]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); b.disabled = !!state.focus; });
+        els.panel.classList.toggle('disabled', !!state.focus);
+        els.back.hidden = !state.focus;
+    }
+
+    // ---------- camera ----------
+    const VIEWS = {
+        front: { pos: V(0, 1.0, 2.95), target: V(0, 0.9, 0) },
+        back: { pos: V(0, 1.0, -2.95), target: V(0, 0.9, 0) },
+        side: { pos: V(2.95, 1.0, 0), target: V(0, 0.9, 0) },
+        perspective: { pos: V(1.8, 1.3, 2.5), target: V(0, 0.9, 0) }
+    };
+    function flyTo(pos, target, ms) {
+        tween = { t0: performance.now(), dur: ms || 900, p0: camera.position.clone(), p1: pos.clone(), c0: controls.target.clone(), c1: target.clone() };
+    }
+    function setActiveView(name) { els.views.forEach(b => b.classList.toggle('on', b.dataset.view === name)); }
+    els.views.forEach(b => b.addEventListener('click', () => {
+        if (state.focus) exitFocus(true);
+        const v = VIEWS[b.dataset.view];
+        flyTo(v.pos, v.target, 900); setActiveView(b.dataset.view); idleUntil = performance.now() + 5000;
+    }));
+    controls.addEventListener('start', () => { tween = null; idleUntil = performance.now() + 6000; setActiveView(''); });
+
+    // ---------- info + callouts ----------
+    function showInfo(tag, name, text, facts) {
+        els.tag.textContent = tag; els.name.textContent = name; els.text.textContent = text;
+        els.facts.innerHTML = (facts || []).map(f => '<li>' + f + '</li>').join('');
+        els.info.classList.remove('swap'); void els.info.offsetWidth; els.info.classList.add('swap');
+    }
+    function clearCallouts() { els.callouts.innerHTML = ''; callouts = []; }
+    function addCallout(p) {
+        const el = document.createElement('div');
+        el.className = 'callout';
+        el.innerHTML = '<span class="dot"></span><div class="box"><b></b><span></span></div>';
+        el.querySelector('b').textContent = p.name;
+        el.querySelector('.box span').textContent = p.desc;
+        els.callouts.appendChild(el);
+        callouts.push({ p, el });
+    }
+    function rebuildCallouts() {
+        clearCallouts();
+        const shown = new Set();
+        if (state.focus) parts.forEach(p => { if (p.label && p.organ === state.focus) { addCallout(p); shown.add(p); } });
+        if (state.selected && !shown.has(state.selected)) addCallout(state.selected);
+    }
+    function setSelected(p) {
+        if (state.selected) state.selected.mesh.material.emissive.setHex(0x000000);
+        state.selected = p;
+        if (p) { p.mesh.material.emissive.setHex(0x1d4ed8); p.mesh.material.emissiveIntensity = 0.55; }
+        rebuildCallouts();
+    }
+
+    // ---------- focus on an organ ----------
+    function enterFocus(key) {
+        state.focus = key; targetT = 0; els.spread.value = 0;
+        setSelected(null); applyVisibility();
+        els.organs.forEach(b => b.classList.toggle('on', b.dataset.organ === key));
+        const box = new THREE.Box3();
+        parts.forEach(p => { if (p.organ === key) { p.mesh.geometry.computeBoundingBox(); const b = p.mesh.geometry.boundingBox.clone(); b.translate(p.home); box.union(b); } });
+        const c = box.getCenter(new THREE.Vector3()), size = box.getSize(new THREE.Vector3());
+        const d = Math.max(size.x, size.y, size.z) * 2.5 + 0.22;
+        flyTo(V(c.x + d * 0.25, c.y + d * 0.08, c.z + d), c, 1000);
+        setActiveView(''); idleUntil = performance.now() + 2200;
+        const o = ORGANS[key]; showInfo(o.tag, o.name, o.text, o.facts);
+        rebuildCallouts();
+    }
+    function exitFocus(silent) {
+        state.focus = null; setSelected(null); applyVisibility();
+        els.organs.forEach(b => b.classList.remove('on'));
+        if (!silent) { const v = VIEWS.perspective; flyTo(v.pos, v.target, 900); setActiveView('perspective'); }
+        showInfo('Welcome', 'The human body', 'Choose an organ below to isolate it, or tap any structure on the model to identify it.', []);
+        rebuildCallouts();
+    }
+    els.organs.forEach(b => b.addEventListener('click', () => (state.focus === b.dataset.organ ? exitFocus() : enterFocus(b.dataset.organ))));
+    els.back.addEventListener('click', () => exitFocus());
+    els.chips.forEach(b => b.addEventListener('click', () => { state.sys[b.dataset.sys] = !state.sys[b.dataset.sys]; applyVisibility(); }));
+    let gridFlew = false;
+    els.spread.addEventListener('input', () => {
+        targetT = els.spread.value / 100; idleUntil = performance.now() + 5000;
+        if (targetT > 0.6 && !gridFlew) { gridFlew = true; flyTo(VIEWS.front.pos, VIEWS.front.target, 1000); setActiveView('front'); }
+        if (targetT < 0.3) gridFlew = false;
+    });
+
+    // ---------- picking ----------
+    const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+    function pick(ev) {
+        const r = renderer.domElement.getBoundingClientRect();
+        mouse.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+        ray.setFromCamera(mouse, camera);
+        const organsOnly = state.sys.organ && !state.focus;
+        const list = parts.filter(p => p.vis && p.mesh.visible && (!organsOnly || p.sys === 'organ')).map(p => p.mesh);
+        const hit = ray.intersectObjects(list, false)[0];
+        return hit ? hit.object.userData.part : null;
+    }
+    let down = null;
+    renderer.domElement.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; controls.enableZoom = true; });
+    renderer.domElement.addEventListener('pointerleave', () => { controls.enableZoom = false; });
+    renderer.domElement.addEventListener('pointerup', e => {
+        if (!down) return;
+        const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
+        if (moved > 6) return;
+        const p = pick(e);
+        setSelected(p);
+        if (p) {
+            const o = p.organ && ORGANS[p.organ];
+            if (o && !state.focus) showInfo(o.tag, o.name, o.text, o.facts);
+            else if (state.focus && o) showInfo(o.tag, p.name, p.desc, o.facts);
+            else showInfo(SYS_TAG[p.sys] || '', p.name, p.desc, []);
+            idleUntil = performance.now() + 6000;
+        }
+    });
+    renderer.domElement.addEventListener('pointermove', e => {
+        if (e.buttons) return;
+        renderer.domElement.style.cursor = pick(e) ? 'pointer' : '';
+    });
+
+    // ---------- resize + visibility ----------
+    function resize() {
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%';
+        camera.aspect = w / h;
+        // keep the whole body in view on narrow screens
+        camera.fov = w / h < 1 ? 52 : 38;
+        camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(wrap);
+    resize();
+    new IntersectionObserver(es => { active = es[0].isIntersecting; }, { threshold: 0.05 }).observe(root);
+
+    // ---------- animation loop ----------
+    const C = V(0, 0.95, 0), tmp = new THREE.Vector3(), ident = new THREE.Quaternion();
+    const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const smooth = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+
+    let last = 0;
+    function loop(now) {
+        requestAnimationFrame(loop);
+        if (!active) { last = now; return; }
+        const dt = Math.min(0.1, (now - (last || now)) / 1000); last = now;
+        const kf = 1 - Math.exp(-dt * 9);   // frame-rate independent smoothing
+
+        if (tween) {
+            const k = Math.min(1, (now - tween.t0) / tween.dur), e = ease(k);
+            camera.position.lerpVectors(tween.p0, tween.p1, e);
+            controls.target.lerpVectors(tween.c0, tween.c1, e);
+            if (k >= 1) tween = null;
+        }
+        controls.autoRotate = !tween && now > idleUntil;
+        controls.update();
+
+        // explode / spread
+        curT += (targetT - curT) * (1 - Math.exp(-dt * 7));
+        const e = Math.min(curT / 0.55, 1), g = smooth((curT - 0.5) / 0.5);
+        const sExp = Math.min(1, 1.1 / (1 + 0.7 * e)), sc = sExp + (1 - sExp) * g;
+        world.scale.setScalar(sc);
+        world.position.y = C.y * (1 - sc);
+        parts.forEach(p => {
+            tmp.copy(p.home).sub(C).multiplyScalar(e * 0.7).add(p.home);
+            if (g > 0) tmp.lerp(p.grid, g);
+            p.mesh.position.copy(tmp);
+            p.mesh.quaternion.copy(ident).slerp(p.gridQuat, g);
+            p.mesh.scale.setScalar(1 + (p.gs - 1) * g);
+            const m = p.mesh.material;
+            m.opacity += (p.targetOp - m.opacity) * kf;
+            m.transparent = m.opacity < 0.985;
+            m.depthWrite = m.opacity > 0.6;
+            p.mesh.visible = m.opacity > 0.02;
+        });
+
+        // counter
+        const n = parts.filter(p => p.vis).length;
+        shownCount += (n - shownCount) * kf;
+        els.count.textContent = Math.round(shownCount);
+
+        // callout positions
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        callouts.forEach(c => {
+            c.p.mesh.getWorldPosition(tmp);
+            tmp.project(camera);
+            const hidden = tmp.z > 1 || !c.p.mesh.visible;
+            c.el.style.display = hidden ? 'none' : '';
+            if (!hidden) c.el.style.transform = 'translate(' + ((tmp.x * 0.5 + 0.5) * w).toFixed(1) + 'px,' + ((-tmp.y * 0.5 + 0.5) * h).toFixed(1) + 'px)';
+        });
+
+        renderer.render(scene, camera);
+    }
+
+    applyVisibility();
+    msg.style.display = 'none';
+    requestAnimationFrame(loop);
+})();
+    </script>
 </body>
 
 </html>
